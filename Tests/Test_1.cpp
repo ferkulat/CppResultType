@@ -1,0 +1,79 @@
+//
+// Created by marcel on 3/30/17.
+//
+#include "catch.hpp"
+#include "result_type.h"
+
+using ResultType::operator|;
+using ResultType::Result;
+using ResultType::IsSuccess;
+using ResultType::IsError;
+constexpr auto multiplyBy(int mul) {
+    return [mul](int val){
+        return val * mul;
+    };
+}
+enum class Error{Fail1, NotOdd};
+
+constexpr auto OddsToStr(){
+    using ReturnType = Result<std::string, Error>;
+    return [](Result<int, Error>&& rei){
+        if (IsSuccess(rei)){
+            return (rei.RefSuccess()%2)? ReturnType(std::to_string(rei.RefSuccess()))
+                                       : ReturnType(Error::NotOdd);
+        }
+        return ReturnType(std::move(rei).Error());
+    };
+}
+auto ReturnNothing (int&o){
+    return [&o](int i){
+        o=i*3;
+    };
+};
+TEST_CASE("(int | F(int)->int) -> int")
+{
+    constexpr auto actual = 2 | multiplyBy(2);
+    REQUIRE( 4 == actual );
+}
+
+TEST_CASE("(Result<int, Error>(int) | F(int)->int) -> Result<int, Error>(int)")
+{
+    constexpr auto actual = Result<int, Error>(2) | multiplyBy(3);
+    REQUIRE( IsSuccess(actual) );
+    REQUIRE(actual.CRefSuccess() == 6);
+}
+
+TEST_CASE(R"((Result<int, Error>(3) | F(Result<int, Error>)->Result<std::string, Error>) -> Result<std::string, Error>("3"))")
+{
+    auto actual = Result<int, Error>(3) | OddsToStr();
+    REQUIRE( IsSuccess(actual) );
+    REQUIRE(actual.CRefSuccess() == "3");
+}
+
+TEST_CASE(R"((Result<int, Error>(Error::Fail1) | F(Result<int, Error>)->Result<std::string, Error>) -> Result<std::string, Error>(Error::Fail1))")
+{
+    auto actual = Result<int, Error>(Error::Fail1) | OddsToStr();
+    REQUIRE( IsError(actual) );
+    REQUIRE(actual.CRefError() == Error::Fail1);
+}
+
+TEST_CASE(R"((Result<int, Error>(int) | F(Result<int, Error>)->Result<std::string, Error>) -> Result<std::string, Error>(Error::NotOdd))")
+{
+    auto actual = Result<int, Error>(2) | OddsToStr();
+    REQUIRE( IsError(actual) );
+    REQUIRE(actual.CRefError() == Error::NotOdd);
+}
+
+TEST_CASE(R"(int | F(int)-void )->void -> Result<std::string, Error>(Error::NotOdd))")
+{
+    int o{};
+    2 | ReturnNothing(o);
+    REQUIRE(o == 6);
+}
+
+TEST_CASE(R"(Result<int, Error>(int) | F(int)-void )->void -> Result<std::string, Error>(Error::NotOdd))")
+{
+//    int o{};
+//    Result<int, Error>(3) | ReturnNothing(o);
+//    REQUIRE(o == 9);
+}
