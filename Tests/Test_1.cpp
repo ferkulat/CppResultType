@@ -86,9 +86,9 @@ TEST_CASE(R"(Result<T, EX>() | F(Result<T, EY>)->? ) should not compile)")
     auto const f2 = [](Result<int, Error1> r)-> Result<int, Error1>{
         return r;
     };
-
-    constexpr auto non_matching_result_type = std::is_invocable_v< decltype(f2),Result<int, Error>>;
-    constexpr auto matching_result_type = std::is_invocable_v< decltype(f2),Result<int, Error1>>;
+    using Callee = decltype(f2);
+    constexpr auto non_matching_result_type = std::is_invocable_v<Callee, Result<int, Error>>;
+    constexpr auto matching_result_type     = std::is_invocable_v<Callee, Result<int, Error1>>;
     REQUIRE(non_matching_result_type == false);
     REQUIRE(matching_result_type == true);
 }
