@@ -86,6 +86,8 @@ namespace ResultType {
         using ArgType = Result<T, E>;
         using ArgSuccessType = decltype(std::forward<Result<T, E>>(result).Success());
 
+        static_assert(std::is_invocable_v<Callee, Result<T, E>> || std::is_invocable_v<Callee, T>);
+
         if constexpr (std::is_invocable_v<Callee, Result<T, E>>){
             using callee_return_type = decltype(f(std::declval<ArgType>()));
             return f(std::forward<Result<T, E>>(result));
@@ -97,18 +99,19 @@ namespace ResultType {
                                          : callee_return_type(result.Error());
             }
             else{
-                return IsSuccess(result) ? Result<callee_return_type, E>(f(std::forward<Result<T, E>>(result).Success()))
-                                         : Result<callee_return_type, E>(std::forward<Result<T, E>>(result).Error());
+                if constexpr (std::is_void_v<callee_return_type>){
+                    if (IsSuccess(result)){
+                        f(std::forward<Result<T, E>>(result).Success());
+                    }
+                }
+                else {
+                    using ReturnType = Result<callee_return_type, E>;
+                    return IsSuccess(result)
+                        ? ReturnType(f(std::forward<Result<T, E>>(result).Success()))
+                        : ReturnType(std::forward<Result<T, E>>(result).Error());
+                }
             }
         }
-//        if constexpr(is_detected<detail::has_Success, callee_return_type>::value) {
-//            return IsSuccess(result) ? f(std::forward<Result<T, E>>(result))
-//                                     : callee_return_type(result.Error());
-//        }
-//        else if constexpr(std::is_void_v<callee_return_type>){
-//            f(std::forward<Result<T, E>>(result));
-//        }
-//        return Result<callee_return_type, E>(f(std::forward<Result<T, E>>(result)));
     }
 }
 #endif //RESULT_TYPE_H
