@@ -27,10 +27,10 @@ namespace ResultType {
         constexpr explicit Result(SuccessType const &value) : result_type_value(value) {
         }
 
-        constexpr explicit Result(SuccessType &&value) : result_type_value(std::move(value)) {
+        constexpr Result(SuccessType &&value) : result_type_value(std::move(value)) {
         }
 
-        constexpr explicit Result(ErrorType &&value) : result_type_value(std::move(value)) {
+        constexpr Result(ErrorType &&value) : result_type_value(std::move(value)) {
         }
 
         constexpr ResultState State() const {
@@ -95,8 +95,8 @@ namespace ResultType {
         else if constexpr (std::is_invocable_v<Callee, T>){
             using callee_return_type = decltype(f(std::declval<ArgSuccessType>()));
             if constexpr (is_detected<detail::has_Success, callee_return_type>::value) {
-                return IsSuccess(result) ? f(result.Success())
-                                         : callee_return_type(result.Error());
+                return IsSuccess(result) ? f(std::forward<Result<T, E>>(result).Success())
+                                         : callee_return_type(std::forward<Result<T, E>>(result).Error());
             }
             else{
                 if constexpr (std::is_void_v<callee_return_type>){
