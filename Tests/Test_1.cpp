@@ -46,6 +46,13 @@ TEST_CASE("(Result<int, Error>(int) | F(int)->int) -> Result<int, Error>(int)")
     REQUIRE(actual.CRefSuccess() == 6);
 }
 
+TEST_CASE("(Result<int, Error>(Error) | F(int)->int) -> Result<int, Error>(Error)")
+{
+constexpr auto actual = Result<int, Error>(Error::Fail1) | multiplyBy(3);
+REQUIRE( IsError(actual) );
+REQUIRE(actual.CRefError() == Error::Fail1);
+}
+
 TEST_CASE(R"((Result<int, Error>(3) | F(Result<int, Error>)->Result<std::string, Error>) -> Result<std::string, Error>("3"))")
 {
     auto actual = Result<int, Error>(3) | OddsToStr();
