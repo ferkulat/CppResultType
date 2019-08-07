@@ -19,6 +19,8 @@ namespace ResultType {
     enum class ResultState {
         Success, Error
     };
+    template<class T>
+    using is_result_type = is_detected<detail::has_Success, T> ;
 
     template<class SuccessType, class ErrorType>
     class Result {
@@ -82,33 +84,32 @@ namespace ResultType {
     }
 
     template<typename T, typename E, typename Callee>
-    constexpr auto operator|(Result<T, E> &&result, Callee &&f) {
+    constexpr auto operator|(Result<T, E> &&arg, Callee &&f) {
         using ArgType = Result<T, E>;
-        using ArgSuccessType = decltype(std::forward<Result<T, E>>(result).Success());
+        using ArgSuccessType = decltype(std::forward<ArgType>(arg).Success());
 
-        static_assert(std::is_invocable_v<Callee, Result<T, E>> || std::is_invocable_v<Callee, T>);
+        static_assert(std::is_invocable_v<Callee, ArgType> || std::is_invocable_v<Callee, T>);
 
-        if constexpr (std::is_invocable_v<Callee, Result<T, E>>){
-            using callee_return_type = decltype(f(std::declval<ArgType>()));
-            return f(std::forward<Result<T, E>>(result));
+        if constexpr (std::is_invocable_v<Callee, ArgType>){
+            return f(std::forward<ArgType>(arg));
         }
         else if constexpr (std::is_invocable_v<Callee, T>){
             using callee_return_type = decltype(f(std::declval<ArgSuccessType>()));
-            if constexpr (is_detected<detail::has_Success, callee_return_type>::value) {
-                return IsSuccess(result) ? f(std::forward<Result<T, E>>(result).Success())
-                                         : callee_return_type(std::forward<Result<T, E>>(result).Error());
+            if constexpr (is_result_type<callee_return_type>::value) {
+                return IsSuccess(arg) ? f(std::forward<ArgType>(arg).Success())
+                                         : callee_return_type(std::forward<ArgType>(arg).Error());
             }
             else{
                 if constexpr (std::is_void_v<callee_return_type>){
-                    if (IsSuccess(result)){
-                        f(std::forward<Result<T, E>>(result).Success());
+                    if (IsSuccess(arg)){
+                        f(std::forward<ArgType>(arg).Success());
                     }
                 }
                 else {
                     using ReturnType = Result<callee_return_type, E>;
-                    return IsSuccess(result)
-                        ? ReturnType(f(std::forward<Result<T, E>>(result).Success()))
-                        : ReturnType(std::forward<Result<T, E>>(result).Error());
+                    return IsSuccess(arg)
+                        ? ReturnType(f(std::forward<ArgType>(arg).Success()))
+                        : ReturnType(std::forward<ArgType>(arg).Error());
                 }
             }
         }
