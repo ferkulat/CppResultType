@@ -8,9 +8,9 @@ using ResultType::operator|;
 using ResultType::Result;
 using ResultType::IsSuccess;
 using ResultType::IsError;
-constexpr auto multiplyBy(int mul) {
-    return [mul](int val){
-        return val * mul;
+constexpr auto multiplyBy(int factor) {
+    return [factor](int val){
+        return val * factor;
     };
 }
 enum class Error{Fail1, NotOdd};
