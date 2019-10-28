@@ -111,7 +111,50 @@ The idea of ```std::optional<T>``` made more general, would be something like
 ```Result<Success, Error>``` where you are free to transport other error types than ```bool```.
 It seems to make things easier to use the same type of Error in you whole project.
 Which is not really a limitation, since you can use a scoped enum or something like ```std::variant<ErrorType1, ErrorType2, ...>```.
+```c++
+#include <result_type.h>
 
+using ResultType::operator|();
+
+enum class Error{Err1, Err2, Err2};
+
+auto someComplexCalculation(int value)-> int{
+    ...
+}
+
+auto someSimpleCalculation(int value)->int{
+    ...
+}
+auto getInputFromUser()->std::string{
+    ....
+    return something;
+}
+
+auto convertToInt(std::string const& input) -> ResultType<int, Error>{
+    std::stringstream s;
+    int result;
+    s << input;
+    s >> result;
+    if (s.fail()){
+        return Error::Err1;
+    }
+    return result;
+}
+
+auto const result = getInputFromUser() | convertToInt | someComplexCalculation | someSimpleCalculation;
+
+// to check for error
+if (ResultType::IsError(result)){
+    doSomethingWithTheError(result.CRefError());
+    return std::move(result).Error();
+}
+// to check for success
+if (ResultType::IsSuccess(result)){
+    doSomething(result.CRefSuccess());
+}
+```
+
+Sometimes when you do explicit checking on error and success, you realize you can put the action on success in a function and add it to the existing chain.
 
 ### Links to sources that inspired me
 
