@@ -27,7 +27,7 @@ constexpr auto OddsToStr(){
     };
 }
 
-auto ReturnNothing (int&o){
+auto MultiplyByThreeStoreInInputReferenceAndReturnVoid (int&o){
     return [&o](int i){
         o=i*3;
     };
@@ -48,9 +48,9 @@ TEST_CASE("(Result<int, Error>(int) | F(int)->int) -> Result<int, Error>(int)")
 
 TEST_CASE("(Result<int, Error>(Error) | F(int)->int) -> Result<int, Error>(Error)")
 {
-constexpr auto actual = Result<int, Error>(Error::Fail1) | multiplyBy(3);
-REQUIRE( IsError(actual) );
-REQUIRE(actual.CRefError() == Error::Fail1);
+    constexpr auto actual = Result<int, Error>(Error::Fail1) | multiplyBy(3);
+    REQUIRE( IsError(actual) );
+    REQUIRE(actual.CRefError() == Error::Fail1);
 }
 
 TEST_CASE(R"((Result<int, Error>(3) | F(Result<int, Error>)->Result<std::string, Error>) -> Result<std::string, Error>("3"))")
@@ -77,15 +77,24 @@ TEST_CASE(R"((Result<int, Error>(int) | F(Result<int, Error>)->Result<std::strin
 TEST_CASE(R"(int | F(int)-void )->void -> void)")
 {
     int o{};
-    2 | ReturnNothing(o);
+    2 | MultiplyByThreeStoreInInputReferenceAndReturnVoid(o);
     REQUIRE(o == 6);
 }
 
-TEST_CASE(R"(Result<int, Error>(int) | F(int)-void )->void -> void)")
+TEST_CASE(R"(Given a function that takes an int and returns void, when piping Result<int, Error>(int) into it, it returns Result<NothingType, Error>(NothingType))")
 {
     int o{};
-    Result<int, Error>(3) | ReturnNothing(o);
+    auto const actual = Result<int, Error>(3) | MultiplyByThreeStoreInInputReferenceAndReturnVoid(o);
+    REQUIRE(IsSuccess(actual));
     REQUIRE(o == 9);
+}
+
+TEST_CASE(R"(Given a function that takes an int and returns void, when piping Result<int, Error>(Error), it returns  Result<NothingType, Error>(Error))")
+{
+    int o{1};
+    auto const actual = Result<int, Error>(Error::Fail1) | MultiplyByThreeStoreInInputReferenceAndReturnVoid(o);
+    REQUIRE(IsError(actual));
+    REQUIRE(o == 1);
 }
 
 TEST_CASE(R"(Result<T, EX>() | F(Result<T, EY>)->? ) should not compile)")

@@ -1,3 +1,5 @@
+master: [![Build Status](https://travis-ci.org/ferkulat/CppResultType.svg?branch=master)](https://travis-ci.org/ferkulat/CppResultType)
+[![Build status](https://ci.appveyor.com/api/projects/status/github/ferkulat/CppResultType?brach=master&svg=true)](https://ci.appveyor.com/project/ferkulat/CppResultType)
 # CppResultType
 This a header only for a type of Result<T,E>.
 
