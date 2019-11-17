@@ -1,5 +1,17 @@
+#project(resulttypetests LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(SOURCE_FILES TestMain.cpp Test_1.cpp catch.hpp Test_with_variants.cpp)
+set(EXTERN_DEPENDENCIES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/extern)
+include(catch2)
+include(warnings)
+set(SOURCE_FILES TestMain.cpp Test_1.cpp Test_with_variants.cpp)
 
-add_executable(tests ${SOURCE_FILES})
-target_link_libraries (tests )
+add_executable(resulttypetests ${SOURCE_FILES})
+target_include_directories(resulttypetests
+                            PRIVATE ${CMAKE_SOURCE_DIR}/include
+                            SYSTEM ${EXTERN_CATCH_HEADER_DIR})
+add_test(
+        NAME resulttypetests
+        COMMAND resulttypetests
+)
