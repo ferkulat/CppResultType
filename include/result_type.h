@@ -22,6 +22,8 @@ namespace ResultType {
     template<class T>
     using is_result_type = is_detected<detail::has_Success, T>;
 
+    struct NothingType{};
+
     template<class SuccessType, class ErrorType>
     class Result {
         std::variant<SuccessType, ErrorType> result_type_value;
@@ -100,9 +102,12 @@ namespace ResultType {
                                           : callee_return_type(std::forward<ArgType>(arg).Error());
                 } else {
                     if constexpr (std::is_void_v<callee_return_type>) {
+                        using ReturnType = Result<NothingType, typename std::remove_reference<ArgErrorType>::type>;
                         if (IsSuccess(arg)) {
                             f(std::forward<ArgType>(arg).Success());
+                            return ReturnType(NothingType{});
                         }
+                        return ReturnType(std::forward<ArgType>(arg).Error());
                     } else {
                         using ReturnType = Result<callee_return_type, typename std::remove_reference<ArgErrorType>::type>;
                         return IsSuccess(arg)
