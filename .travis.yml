@@ -4,6 +4,7 @@
 branches:
   except:
   - /dev-appveyor.+/
+  - /doc.+/
 
 language: cpp
 os: linux

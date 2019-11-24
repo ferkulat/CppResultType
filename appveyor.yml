@@ -4,6 +4,7 @@ version: "{build}"
 branches:
   except:
     - /dev-travis.+/
+    - /doc.+/
 
 os:
   - Visual Studio 2019
@@ -64,8 +65,8 @@ configuration:
 
 #Cmake will autodetect the compiler, but we set the arch
 before_build:
-  - choco upgrade cmake
-  - set path=C:\Program Files\CMake\bin;%path%
+  #- choco upgrade cmake
+  #- set path=C:\Program Files\CMake\bin;%path%
   - set CXXFLAGS=%additional_flags%
   # Indirection because appveyor doesn't handle multiline batch scripts properly
   # https://stackoverflow.com/questions/37627248/how-to-split-a-command-over-multiple-lines-in-appveyor-yml/37647169#37647169

@@ -5,7 +5,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(EXTERN_DEPENDENCIES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/extern)
 include(catch2)
 include(warnings)
-set(SOURCE_FILES TestMain.cpp Test_1.cpp Test_with_variants.cpp)
+set(SOURCE_FILES
+        TestMain.cpp
+        Test_possible_combinations.cpp
+        Test_with_variants.cpp
+        )
 
 add_executable(resulttypetests ${SOURCE_FILES})
 target_include_directories(resulttypetests
