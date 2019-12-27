@@ -14,4 +14,7 @@ FetchContent_Declare(
   DOWNLOAD_DIR        ${EXTERN_CATCH_HEADER_DIR}
 )
 
-FetchContent_MakeAvailable(extern_catch2)
+FetchContent_GetProperties(extern_catch2)
+if(NOT extern_catch2_POPULATED)
+    FetchContent_Populate(extern_catch2)
+endif()
