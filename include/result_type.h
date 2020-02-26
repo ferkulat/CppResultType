@@ -26,6 +26,9 @@ namespace ResultType {
         using ResultSuccessType = SuccessType;
         using ResultErrorType   = ErrorType;
 
+        constexpr Result(Result&&) noexcept = default;
+        constexpr Result& operator=(Result&&) noexcept = default;
+
         template<typename T = SuccessType, typename SFINAE = typename std::enable_if<std::is_copy_constructible_v<T> && !std::is_trivial_v<T>,bool>::type, typename P = SFINAE>
         constexpr explicit Result(SuccessType const &value) : result_type_value(value) {
         }
