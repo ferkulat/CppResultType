@@ -24,7 +24,7 @@ struct returns{
     }
 };
 template<>
-struct returns<void>{
+struct  returns<void>{
     using type = void;
     bool operator==(returns const& other)const{
         return true;
@@ -40,7 +40,7 @@ struct toFunction{
 
 template<typename T>
 struct piping{
-    explicit piping(T t):value(t){}
+    explicit piping(T t):value(std::move(t)){}
     using type = T;
     T value;
 };
