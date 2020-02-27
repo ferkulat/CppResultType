@@ -21,13 +21,14 @@ namespace ResultType {
 
     template<class SuccessType, class ErrorType>
     class Result {
-        std::variant<SuccessType, ErrorType> result_type_value;
+        using ValueType = std::variant<SuccessType, ErrorType>;
+        ValueType result_type_value;
     public:
         using ResultSuccessType = SuccessType;
         using ResultErrorType   = ErrorType;
 
-        constexpr Result(Result&&) noexcept = default;
-        constexpr Result& operator=(Result&&) noexcept = default;
+        constexpr Result(Result&&) noexcept(std::is_nothrow_move_constructible_v<ValueType>) = default;
+        constexpr Result& operator=(Result&&) noexcept(std::is_nothrow_move_assignable_v<ValueType>) = default;
 
         template<typename T = SuccessType, typename SFINAE = typename std::enable_if<std::is_copy_constructible_v<T> && !std::is_trivial_v<T>,bool>::type, typename P = SFINAE>
         constexpr explicit Result(SuccessType const &value) : result_type_value(value) {
