@@ -9,7 +9,9 @@ set(SOURCE_FILES
         TestMain.cpp
         Test_possible_combinations.cpp
         Test_with_variants.cpp
-        properties_tests.cpp)
+        properties_tests.cpp
+        Test_tuple_holding_result.cpp
+        )
 
 add_executable(resulttypetests ${SOURCE_FILES})
 target_include_directories(resulttypetests

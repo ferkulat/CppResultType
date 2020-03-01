@@ -73,6 +73,5 @@ using detected_or = detail::detector<Default, void, Op, Args...>;
                         ,detail::has_method_value_or<T>
             >
     > : std::true_type {};
-
 }
 #endif //CSV2XLS_TYPETRAITS_H
