@@ -17,7 +17,7 @@ namespace ResultType {
     };
 
     struct NothingType{
-        bool operator==(NothingType const& other)const{return true;}
+        bool operator==(NothingType const& )const{return true;}
     };
 
     template<class SuccessType, class ErrorType>
