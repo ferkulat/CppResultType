@@ -28,8 +28,10 @@ namespace ResultType {
         using ResultSuccessType = SuccessType;
         using ResultErrorType   = ErrorType;
 
-        constexpr Result(Result&&) noexcept(std::is_nothrow_move_constructible_v<ValueType>) = default;
-        constexpr Result& operator=(Result&&) noexcept(std::is_nothrow_move_assignable_v<ValueType>) = default;
+//        constexpr Result(Result&&) noexcept(std::is_nothrow_move_constructible_v<ValueType>) = default;
+//        constexpr Result& operator=(Result&&) noexcept(std::is_nothrow_move_assignable_v<ValueType>) = default;
+//        constexpr Result(Result const&) noexcept(std::is_nothrow_copy_constructible_v<ValueType>) = default;
+//        constexpr Result& operator=(Result const&) noexcept(std::is_nothrow_copy_assignable_v<ValueType>) = default;
 
         template<typename T = SuccessType, typename SFINAE = typename std::enable_if<std::is_copy_constructible_v<T> && !std::is_trivial_v<T>,bool>::type, typename P = SFINAE>
         constexpr explicit Result(SuccessType const &value) : result_type_value(value) {
@@ -57,9 +59,21 @@ namespace ResultType {
         constexpr SuccessType &&Success() &&{
             return std::get<SuccessType>(std::move(result_type_value));
         }
+        constexpr SuccessType& Success() &{
+            return std::get<SuccessType>(result_type_value);
+        }
+        constexpr SuccessType const& Success() const&{
+            return std::get<SuccessType>(result_type_value);
+        }
 
         constexpr ErrorType &&Error() &&{
             return std::get<ErrorType>(std::move(result_type_value));
+        }
+        constexpr ErrorType& Error() &{
+            return std::get<ErrorType>(result_type_value);
+        }
+        constexpr ErrorType const& Error() const&{
+            return std::get<ErrorType>(result_type_value);
         }
 
         constexpr SuccessType &RefSuccess() &{
@@ -282,8 +296,8 @@ namespace detail{
     template<typename ArgType, typename Callee>
     constexpr auto callWithResult(ArgType &&arg, Callee&& callee) {
 
-        using ErrorReturnType = typename std::remove_reference<typename ArgType::ResultErrorType>::type;
-        using ArgSuccessType = typename std::remove_reference<typename ArgType::ResultSuccessType>::type;
+        using ErrorReturnType = typename std::remove_reference_t<ArgType>::ResultErrorType;
+        using ArgSuccessType = typename std::remove_reference_t<ArgType>::ResultSuccessType;
 
         if constexpr (std::is_invocable_v<Callee, ArgType>) {
             return callee(std::forward<ArgType>(arg));
