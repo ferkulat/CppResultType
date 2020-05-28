@@ -34,7 +34,7 @@ namespace ResultType {
 //        constexpr Result& operator=(Result const&) noexcept(std::is_nothrow_copy_assignable_v<ValueType>) = default;
 
         template<typename T = SuccessType, typename SFINAE = typename std::enable_if<std::is_copy_constructible_v<T> && !std::is_trivial_v<T>,bool>::type, typename P = SFINAE>
-        constexpr explicit Result(SuccessType const &value) : result_type_value(value) {
+        constexpr Result(SuccessType const &value) : result_type_value(value) {
         }
 
         template<typename T = SuccessType, typename SFINAE = typename std::enable_if<!std::is_trivial_v<T>,bool>::type, typename P = SFINAE>
