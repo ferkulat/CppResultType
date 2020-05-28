@@ -214,7 +214,7 @@ namespace detail{
         template<typename Tuple>
         constexpr static
         std::enable_if_t<!is_result_type<std::tuple_element_t<0, Tuple>>::value, std::optional<ErrorType>>
-        getImpl(Tuple &&tuple, tuple_element_index<0>) {
+        getImpl(Tuple &&, tuple_element_index<0>) {
             return std::optional<ErrorType>();
         }
 
