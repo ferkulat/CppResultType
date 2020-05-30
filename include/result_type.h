@@ -435,6 +435,26 @@ namespace detail{
             }
         }
 
+        template<typename T> struct wrong_type;
+
+        struct asExitCode{
+            template<typename T>
+            auto operator()(T const& item)->int{
+                if constexpr (ResultType::is_result_type<T>::value) {
+                    if (ResultType::IsError(item)) {
+                        return -1;
+                    }
+                    return 0;
+                }
+                else if(std::is_same_v<T, int>){
+                    return item;
+                }
+                else{
+                    wrong_type<T>{};
+                }
+            }
+        };
+
     }
 }
 #endif //RESULT_TYPE_H
