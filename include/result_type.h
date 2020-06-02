@@ -10,6 +10,7 @@
 #include <typetraits.h>
 #include <optional>
 #include <tuple>
+#include <type_traits>
 
 namespace ResultType {
     enum class ResultState {
@@ -437,11 +438,11 @@ namespace detail{
 
         template<typename T> struct wrong_type;
 
-        struct asExitCode{
+        struct intoExitCode{
             template<typename T>
             auto operator()(T const& item)->int{
-                if constexpr (ResultType::is_result_type<T>::value) {
-                    if (ResultType::IsError(item)) {
+                if constexpr (is_result_type<T>::value) {
+                    if (IsError(item)) {
                         return -1;
                     }
                     return 0;
@@ -454,6 +455,52 @@ namespace detail{
                 }
             }
         };
+        namespace helper_detail{
+
+            template<typename OStreamType, typename T>
+            void streamSuccessHelper(OStreamType& os, T const& t){
+                if constexpr (is_result_type<T>::value){
+                    if(IsSuccess(t)){
+                        streamSuccessHelper(os, t.CRefSuccess());
+                    }
+                }
+                else if constexpr (is_optional_type<T>::value){
+                    if(t.has_value()) {
+                        streamSuccessHelper(os, t.value());
+                    }
+                }
+                else{
+                    os << t;
+                }
+            }
+
+            template<typename OStreamType, typename T>
+            void streamErrorHelper(OStreamType& os, T const& t){
+                if constexpr (is_result_type<T>::value){
+                    if(IsError(t)){
+                        os << t.CRefError();
+                    }
+                }
+            }
+
+        }
+
+        template<typename OStreamType>
+        auto streamSuccessTo(OStreamType& os){
+            return [&os](auto&& item){
+                helper_detail::streamSuccessHelper(os, item);
+                return std::forward<decltype(item)>(item);
+            };
+        }
+
+        template<typename OStreamType>
+        auto streamErrorTo(OStreamType& os){
+            return [&os](auto&& item){
+                helper_detail::streamErrorHelper(os, item);
+                return std::forward<decltype(item)>(item);
+            };
+        }
+
 
     }
 }
