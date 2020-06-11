@@ -31,10 +31,10 @@ namespace detail {
         using has_Success = decltype(std::declval<T>().Success());
 
         template<class T>
-        using has_method_has_value = decltype(std::declval<T>().has_value());
+        using has_method_has_value = decltype(std::declval<std::remove_reference_t<T>>().has_value());
 
         template<class T>
-        using has_method_value_or = decltype(std::declval<T>().value_or(std::declval<typename T::value_type>()));
+        using has_method_value_or = decltype(std::declval<std::remove_reference_t<T>>().value_or(std::declval<typename std::remove_reference_t<T>::value_type>()));
     }
 
 // special type to indicate detection failure
