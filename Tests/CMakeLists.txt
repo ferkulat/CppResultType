@@ -11,6 +11,7 @@ set(SOURCE_FILES
         Test_with_variants.cpp
         properties_tests.cpp
         Test_tuple_holding_result.cpp
+        Test_hepler.cpp
         )
 
 add_executable(resulttypetests ${SOURCE_FILES})
