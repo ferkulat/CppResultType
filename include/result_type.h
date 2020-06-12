@@ -361,7 +361,7 @@ namespace detail{
                                 auto result = callee(std::forward<ArgType>(arg).Success().value());
                                 return (IsSuccess(result))
                                             ? ReturnType{std::optional<CalleeReturnSuccessType>(std::move(result).Success())}
-                                            : ReturnType{std::optional<CalleeReturnSuccessType>{}};
+                                            : ReturnType{std::move(result).Error()};
                             }
                             return ReturnType{std::optional<CalleeReturnSuccessType>{}};
 
