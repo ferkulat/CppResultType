@@ -97,24 +97,26 @@ It enables us:
 - make sure the result of this chain is a simple optional and not lots of nested optionals.
 - chain of an optional value with a function, which returns a non optional, returns an optional 
 ```c++
-template<typename Value, typename Function>
-auto operator|(Value value, Function function){
-        return function(value);
-}
-
-// lots of details are missing here
-// its about the basic idea, not a working implementation
-
-template<typename Value, typename Function>
-auto operator|(std::optional<Value> value, Function function){
-        if (value.has_value()){
-            return function(value.value());
+namespace ResultType{
+    template<typename Value, typename Function>
+    auto operator|(Value value, Function function){
+        // Simplification, incomplete, maybe even incorrect!!
+        if constexpr (is_invocable_v<Function, Value>){
+            return function(value);
         }
-        return std::nullopt
+        else if constexpr (is_optional_v<Value>){
+            using ReturnType = std::optional<decltype(function(value.value()))>;
+            if (value){
+                return ReturnType(function(value.value()));
+            }
+            return ReturnType();
+        }
+        ...
+    }
 }
 
-std::optional<int> someFunction(SomeClass someClass)
-{
+auto someFunction(SomeClass someClass) -> std::optional<int> {
+    using ResultType::operator|;
     return someClass | someOtherFunction | someReallyOtherFunction;
 }
 
@@ -126,12 +128,11 @@ We could use lambdas to solve this.
 
 The idea of ```std::optional<T>``` made more general, would be something like
 ```Result<Success, Error>``` where you are free to transport other error types than ```bool```.
-It seems to make things easier to use the same type of Error in you whole project.
+It seems to make things easier to use the same type of Error in your whole project.
 Which is not really a limitation, since you can use a scoped enum or something like ```std::variant<ErrorType1, ErrorType2, ...>```.
 ```c++
 #include <result_type.h>
 
-using ResultType::operator|();
 
 enum class Error{Err1, Err2, Err2};
 
@@ -160,6 +161,7 @@ auto convertToInt(std::string const& input) -> ResultType<Integer, Error>{
     return Integer{result};
 }
 
+using ResultType::operator|;
 auto const result = getInputFromUser() | convertToInt | someComplexCalculation | someSimpleCalculation;
 
 // to check for error
@@ -193,8 +195,6 @@ To mitigate the limitation of operator overload we don't use ```int``` as value 
 
 #include <result_type.h>
 
-using ResultType::operator|();
-
 struct Integer{int value;}; // to make the overloaded operator|() work with normal functions
 struct SomeType{...};
 
@@ -224,6 +224,7 @@ But it is hard to read. When reading source code, you do this from left to right
 To know what is happening there, you look for the most inner call, and go back to the left.
 In this case this library can improve the reading flow:
 ```c++
+using ResultType::operator|;
 auto const result = SomeType{2.0} | mostComplexCalculation | someComplexCalculation | someSimpleCalculation;
 ``` 
 
@@ -243,7 +244,8 @@ auto calculationWith(double dependency){
 auto insideSomeOtherFunction(){
     auto const dependency = 3.0;
     ...
-    auto const result = SomeType{2.0} | calculationWith(dependency) | mostComplexCalculation | someComplexCalculation;
+   using ResultType::operator|;
+   auto const result = SomeType{2.0} | calculationWith(dependency) | mostComplexCalculation | someComplexCalculation;
     ...
 }
 ```
@@ -257,6 +259,7 @@ auto insideSomeOtherFunction(){
     ...
     using std::placeholders::_1;
     auto calculationWithDependency = [dependency](Integer integer){ return calculationWithTwoParameters(dependency, integer);};
+    using ResultType::operator|;
     auto const result = SomeType{2.0} | calculationWithDependency | mostComplexCalculation | someComplexCalculation;
     ...
 }
@@ -300,7 +303,6 @@ In this case no special rule is applied. The function, which takes a ```std::opt
 ```c++
 #include <result_type.h>
 
-using ResultType::operator|();
 
 
 auto mayReturnNothing(SomeType value)-> std::optional<int>{
@@ -313,6 +315,7 @@ auto canDealWithGettingNothing(std::optional<int> value)->SomeOtherType{
 
 auto insideSomeOtherFunction(SomeType value){
     ...
+    using ResultType::operator|;
     // result is of type 'SomeOtherType'
     auto const result = value | mayReturnNothing | canDealWithGettingNothing;
     ...
@@ -323,7 +326,6 @@ In this case the second function gets called only and if only the returned value
 ```c++
 #include <result_type.h>
 
-using ResultType::operator|();
 
 
 auto mayReturnNothing(SomeType value)-> std::optional<int>{
@@ -336,6 +338,7 @@ auto needsSomething(int value)->SomeOtherType{
 
 auto insideSomeOtherFunction(SomeType value){
     ...
+    using ResultType::operator|;
     // result is of type 'std::optional<SomeOtherType>'
     auto const result = value | mayReturnNothing | needsSomething;
     ...
@@ -347,7 +350,6 @@ In this case the second function gets called only and if only the returned value
 ```c++
 #include <result_type.h>
 
-using ResultType::operator|();
 
 
 auto mayReturnNothing(SomeType value)-> std::optional<int>{
@@ -360,6 +362,7 @@ auto needsSomething(int value)->void{
 
 auto insideSomeOtherFunction(SomeType value){
     ...
+    using ResultType::operator|;
     // result is of type 'std::optional<ResultType::NothingType>'
     auto const result = value | mayReturnNothing | needsSomething;
     ...
@@ -371,7 +374,6 @@ In this case the second function gets called only and if only the returned value
 ```c++
 #include <result_type.h>
 
-using ResultType::operator|();
 
 
 auto mayReturnNothing(SomeType value)-> std::optional<int>{
@@ -384,6 +386,7 @@ auto needsSomething(int value)->std::optional<SomeOtherType>{
 
 auto insideSomeOtherFunction(SomeType value){
     ...
+    using ResultType::operator|;
     // result is of type 'std::optional<SomeOtherType>'
     auto const result = value | mayReturnNothing | needsSomething;
     ...
@@ -406,7 +409,6 @@ In this case no special rule is applied. The function, which takes a ```Result<T
 ```c++
 #include <result_type.h>
 
-using ResultType::operator|();
 
 enum class Error{Fail1, Fail2};
 
@@ -420,6 +422,7 @@ auto canDealWithErrors(ResultType<int, Error> value)->SomeOtherType{
 
 auto insideSomeOtherFunction(SomeType value){
     ...
+    using ResultType::operator|;
     // result is of type 'SomeOtherType'
     auto const result = value | mayReturnError | canDealWithErrors;
     ...
@@ -430,7 +433,6 @@ In this case the second function gets called only and if only the returned value
 ```c++
 #include <result_type.h>
 
-using ResultType::operator|();
 
 enum class Error{Fail1, Fail2};
 
@@ -444,6 +446,7 @@ auto needsSomething(int value)->SomeOtherType{
 
 auto insideSomeOtherFunction(SomeType value){
     ...
+    using ResultType::operator|;
     // result is of type 'Result<SomeOtherType, Error>'
     auto const result = value | mayReturnNothing | needsSomething;
     ...
@@ -455,7 +458,6 @@ In this case the second function gets called only and if only the returned value
 ```c++
 #include <result_type.h>
 
-using ResultType::operator|();
 
 enum class Error{Fail1, Fail2};
 
@@ -469,6 +471,7 @@ auto needsSomething(int value)->void{
 
 auto insideSomeOtherFunction(SomeType value){
     ...
+    using ResultType::operator|;
     // result is of type 'ResultType::Result<ResultType::NothingType, Error>'
     auto const result = value | mayReturnAnError | needsSomething;
     ...
@@ -480,7 +483,6 @@ In this case the second function gets called only and if only the returned value
 ```c++
 #include <result_type.h>
 
-using ResultType::operator|();
 
 enum class Error{Fail1, Fail2};
 
@@ -494,6 +496,7 @@ auto needsSomething(int value)->ResultType::Result<SomeOtherType, Error>{
 
 auto insideSomeOtherFunction(SomeType value){
     ...
+    using ResultType::operator|;
     // result is of type 'ResultType::Result<SomeOtherType, Error>'
     auto const result = value | mayReturnNothing | needsSomething;
     ...
@@ -524,7 +527,6 @@ In this case no special rule is applied. The function, which takes a ```Result<T
 ```c++
 #include <result_type.h>
 
-using ResultType::operator|();
 
 enum class Error{Fail1, Fail2};
 
@@ -538,6 +540,7 @@ auto canDealWithErrors(ResultType<int, Error> value)->SomeOtherType{
 
 auto insideSomeOtherFunction(SomeType value){
     ...
+    using ResultType::operator|;
     // result is of type 'SomeOtherType'
     auto const result = value | mayReturnError | canDealWithErrors;
     ...
@@ -548,7 +551,6 @@ In this case the second function gets called only and if only the returned value
 ```c++
 #include <result_type.h>
 
-using ResultType::operator|();
 
 enum class Error{Fail1, Fail2};
 
@@ -562,6 +564,7 @@ auto needsSomething(int value)->SomeOtherType{
 
 auto insideSomeOtherFunction(SomeType value){
     ...
+    using ResultType::operator|;
     // result is of type 'Result<SomeOtherType, Error>'
     auto const result = value | mayReturnNothing | needsSomething;
     ...
@@ -573,7 +576,6 @@ In this case the second function gets called only and if only the returned value
 ```c++
 #include <result_type.h>
 
-using ResultType::operator|();
 
 enum class Error{Fail1, Fail2};
 
@@ -586,6 +588,7 @@ auto needsSomething(int value)->void{
 }
 
 auto insideSomeOtherFunction(SomeType value){
+    using ResultType::operator|;
     ...
     // result is of type 'ResultType::Result<ResultType::NothingType, Error>'
     auto const result = value | mayReturnAnError | needsSomething;
@@ -598,7 +601,6 @@ In this case the second function gets called only and if only the returned value
 ```c++
 #include <result_type.h>
 
-using ResultType::operator|();
 
 enum class Error{Fail1, Fail2};
 
@@ -611,6 +613,7 @@ auto needsSomething(int value)->ResultType::Result<SomeOtherType, Error>{
 }
 
 auto insideSomeOtherFunction(SomeType value){
+    using ResultType::operator|;
     ...
     // result is of type 'ResultType::Result<SomeOtherType, Error>'
     auto const result = value | mayReturnNothing | needsSomething;
