@@ -50,9 +50,10 @@ TEST_CASE("Make the move constructor noexcept, depending on its success and erro
 
     auto mayreturnsomething = [](){
         auto result = ResultTypeSuccessMayThrow{MayThrowWhenMoveConstructed{}};
-        return std::move(result);
+        return result;
     };
     auto actual = mayreturnsomething(); //just compile without error
+    CHECK(ResultType::IsSuccess(actual));
 
 }
 
