@@ -18,6 +18,7 @@ add_executable(resulttypetests ${SOURCE_FILES})
 target_include_directories(resulttypetests
                             PRIVATE ${CMAKE_SOURCE_DIR}/include
                             SYSTEM ${EXTERN_CATCH_HEADER_DIR})
+target_compile_options(resulttypetests PUBLIC ${WARNINGOPTS})
 add_test(
         NAME resulttypetests
         COMMAND resulttypetests
