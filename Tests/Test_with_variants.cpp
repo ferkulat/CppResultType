@@ -29,18 +29,9 @@ using Error = std::variant<Domain1, Domain2>;
 
 using Value = std::variant<Type1, Type2, Type3>;
 
-
-auto FnReturningT1 = [](int i){
-    return Type1{i+1};
-};
-
 auto FnReturningT2(Type1 t1)->Result<Value , Error >{
     if (t1.val) return Value{Type2{2}};
     else return Error{Domain1::Err1 };
-}
-
-auto FnReturningT3(Type2 t2){
-    return Type3{t2.val};
 }
 
 auto FnTakingValue(Value value){
