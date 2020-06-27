@@ -46,7 +46,7 @@ auto FnReturningT3(Type2 t2){
 auto FnTakingValue(Value value){
     using R = Result<Type4, Error >;
     return MatchType(value,
-         [](Type1 type1)->R{return Type4{4};}
+         [](Type1      )->R{return Type4{4};}
         ,[](auto       )->R{return Error{Domain2::Err2 };}
     );
 }
