@@ -128,7 +128,7 @@ namespace detail{
     };
 
     template<typename T>
-    bool isError(T const &t) {
+    bool isError([[maybe_unused]] T const &t) {
         if constexpr (ResultType::is_result_type<T>::value) {
             return ResultType::IsError(t);
         } else {

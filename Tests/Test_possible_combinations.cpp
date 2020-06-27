@@ -46,7 +46,7 @@ struct piping{
 };
 
 template<typename ReturnType, typename PipedType, typename FunctionType >
-constexpr auto IsTrue(PipedType&& pipedType, FunctionType functionType, ReturnType&& returnType){
+constexpr auto IsTrue(PipedType&& pipedType, FunctionType functionType, [[maybe_unused]] ReturnType&& returnType){
     if constexpr (std::is_same_v<void, typename ReturnType::type>){
         return std::is_same_v<decltype(std::forward<PipedType>(pipedType).value | functionType.value),typename ReturnType::type>;
     }
