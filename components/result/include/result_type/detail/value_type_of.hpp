@@ -17,10 +17,34 @@ namespace result_type::detail {
     struct value_type_of<Optional<S>> {
         using type = S;
     };
+    template<typename S> struct value_type_of<Optional<S>&>{
+        using type = S&;
+    };
+    template<typename S> struct value_type_of<Optional<S>&&>{
+        using type = S&&;
+    };
+    template<typename S> struct value_type_of<Optional<S>const&>{
+        using type = S const&;
+    };
+    template<typename S> struct value_type_of<Optional<S>const&&>{
+        using type = S const&&;
+    };
 
     template<typename S, typename... E>
     struct value_type_of<result_type::Result<S, E...>> {
         using type = typename value_type_of<S>::type;
+    };
+    template<typename S, typename... E> struct value_type_of<result_type::Result<S,E...>&>{
+        using type = typename value_type_of<S&>::type;
+    };
+    template<typename S, typename... E> struct value_type_of<result_type::Result<S,E...>&&>{
+        using type = typename value_type_of<S&&>::type;
+    };
+    template<typename S, typename... E> struct value_type_of<result_type::Result<S,E...>const&&>{
+        using type = typename value_type_of<S const&&>::type;
+    };
+    template<typename S, typename... E> struct value_type_of<result_type::Result<S,E...>const&>{
+        using type = typename value_type_of<S const&>::type;
     };
     template<typename T>
     using value_type_of_t = typename value_type_of<T>::type;
