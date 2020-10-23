@@ -1,8 +1,8 @@
 //
 // Created by marcel on 7/21/19.
 //
-#include "catch.hpp"
-#include "result_type.h"
+#include <catch2/catch.hpp>
+#include "result_type/result.h"
 template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
 template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
@@ -13,10 +13,10 @@ constexpr auto MatchType(V&& variant, Os... overloads)
 }
 
 
-using ResultType::operator|;
-using ResultType::Result;
-using ResultType::IsSuccess;
-using ResultType::IsError;
+using result_type::operator|;
+using result_type::Result;
+using result_type::IsSuccess;
+using result_type::IsError;
 
 enum class Domain1 {Err1, Err2};
 enum class Domain2 {Err1, Err2};

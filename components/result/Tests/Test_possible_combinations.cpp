@@ -2,13 +2,13 @@
 // Created by marcel on 3/30/17.
 //
 #include <type_traits>
-#include "catch.hpp"
-#include "result_type.h"
+#include <catch2/catch.hpp>
+#include "result_type/result.h"
 
-using ResultType::operator|;
-using ResultType::Result;
-using ResultType::IsSuccess;
-using ResultType::IsError;
+using result_type::operator|;
+using result_type::Result;
+using result_type::IsSuccess;
+using result_type::IsError;
 
 enum class Error{Fail1, NotOdd};
 
@@ -58,7 +58,7 @@ constexpr auto IsTrue(PipedType&& pipedType, FunctionType functionType, [[maybe_
 
     }
 }
-using ResultType::NothingType;
+using result_type::NothingType;
 template<class T> using ResOpt = Result<std::optional<T>, Error>;
 template<class T> using Opt = std::optional<T>;
 template<class T> using Res = Result<T, Error>;

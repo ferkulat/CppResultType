@@ -1,0 +1,12 @@
+#ifndef VMS_COMMON_VERSION_HPP
+#define VMS_COMMON_VERSION_HPP
+namespace result_type::version {
+    constexpr static auto semantic_version = R"(@SEMVER@)";
+    constexpr static auto git_describe = R"(@GIT_DESCRIBE@)";
+    struct Version{
+        constexpr static auto major = @VERSION_MAJOR@;
+        constexpr static auto minor = @VERSION_MINOR@;
+        constexpr static auto patch = @VERSION_PATCH@;
+    };
+}
+#endif //VMS_COMMON_VERSION_HPP

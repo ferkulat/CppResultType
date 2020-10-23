@@ -7,12 +7,12 @@
 
 #include <variant>
 
-#include <typetraits.h>
+#include <result_type/typetraits.h>
 #include <optional>
 #include <tuple>
 #include <type_traits>
 
-namespace ResultType {
+namespace result_type {
     enum class ResultState {
         Success, Error
     };
@@ -114,7 +114,7 @@ namespace detail{
 
     template<typename...Ts>
     struct is_tuple_with_result<std::tuple<Ts...>> {
-        constexpr static auto value = (ResultType::is_result_type<Ts>::value || ...);
+        constexpr static auto value = (result_type::is_result_type<Ts>::value || ...);
     };
 
     template<typename S>
@@ -123,14 +123,14 @@ namespace detail{
     };
 
     template<typename S, typename E>
-    struct success_type<ResultType::Result<S, E>> {
+    struct success_type<result_type::Result<S, E>> {
         using type = S;
     };
 
     template<typename T>
     bool isError([[maybe_unused]] T const &t) {
-        if constexpr (ResultType::is_result_type<T>::value) {
-            return ResultType::IsError(t);
+        if constexpr (result_type::is_result_type<T>::value) {
+            return result_type::IsError(t);
         } else {
             return false;
         }
@@ -138,7 +138,7 @@ namespace detail{
 
     template<typename T>
     auto successOf(T &&t) {
-        if constexpr (ResultType::is_result_type<T>::value) {
+        if constexpr (result_type::is_result_type<T>::value) {
             return std::forward<T>(t).Success();
         } else {
             return std::move(t);
@@ -154,8 +154,8 @@ namespace detail{
     };
 
     template<typename S, typename E, typename...Ts>
-    struct appendIfResultType<ResultType::Result<S, E>, std::tuple<Ts...>> {
-        using type = std::tuple<Ts..., ResultType::Result<S, E>>;
+    struct appendIfResultType<result_type::Result<S, E>, std::tuple<Ts...>> {
+        using type = std::tuple<Ts..., result_type::Result<S, E>>;
     };
 
     template<size_t tailsize, typename Tuple, typename Head, typename...Tail>
@@ -196,7 +196,7 @@ namespace detail{
         constexpr static
         std::enable_if_t<is_result_type<std::tuple_element_t<0, Tuple>>::value, std::optional<ErrorType>>
         getImpl(Tuple &&tuple, tuple_element_index<0>) {
-            return (ResultType::IsError(std::get<0>(tuple)))
+            return (result_type::IsError(std::get<0>(tuple)))
                    ? std::get<0>(std::forward<Tuple>(tuple)).Error()
                    : std::optional<ErrorType>();
         }
@@ -207,7 +207,7 @@ namespace detail{
         getImpl(Tuple &&tuple,
                 tuple_element_index<N>) {
 
-            return (ResultType::IsError(std::get<N>(tuple)))
+            return (result_type::IsError(std::get<N>(tuple)))
                    ? std::get<N>(std::forward<Tuple>(tuple)).Error()
                    : getImpl(std::forward<Tuple>(tuple), tuple_element_index<N - 1>());
         }
@@ -407,7 +407,7 @@ namespace detail{
     }
     namespace helper{
         template<typename T, typename U>
-        using enable_if_is_not_result_and_not_option = std::enable_if<!ResultType::is_result_type<T>::value && !ResultType::is_optional_type<T>::value, U>;
+        using enable_if_is_not_result_and_not_option = std::enable_if<!result_type::is_result_type<T>::value && !result_type::is_optional_type<T>::value, U>;
 
         template<typename T, typename U>
         using enable_if_is_not_result_and_not_option_t = typename enable_if_is_not_result_and_not_option<T,U>::type;
@@ -420,7 +420,7 @@ namespace detail{
             using type = S;
         };
 
-        template<typename S, typename... E> struct value_type_of<ResultType::Result<S,E...>>{
+        template<typename S, typename... E> struct value_type_of<result_type::Result<S,E...>>{
             using type = typename value_type_of<S>::type;
         };
         template <typename T>
@@ -441,11 +441,13 @@ namespace detail{
                 using ReturnSuccessType = decltype(std::apply(tupleOfSuccess, std::forward<Tuple>(tuple)));
                 using ReturnErrorType   = typename std::tuple_element_t<0, AllResultTypes>::ResultErrorType;
 
-                using ReturnType = ResultType::Result<ReturnSuccessType, ReturnErrorType>;
+                using ReturnType = result_type::Result<ReturnSuccessType, ReturnErrorType>;
 
                 auto is_err = [](auto const &...item) {
                     return (detail::isError(item)||...);
                 };
+
+
 
                 if (std::apply(is_err, std::forward<Tuple>(tuple))) {
                     return ReturnType{detail::FirstError<ReturnErrorType>::get(std::forward<Tuple>(tuple)).value()};

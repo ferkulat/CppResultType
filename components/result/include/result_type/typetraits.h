@@ -6,7 +6,7 @@
 #define CSV2XLS_TYPETRAITS_H
 
 #include <type_traits>
-namespace ResultType {
+namespace result_type {
 namespace detail {
     template <class Default, class AlwaysVoid,
               template<class...> class Op, class... Args>

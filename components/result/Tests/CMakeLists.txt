@@ -2,8 +2,8 @@
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(EXTERN_DEPENDENCIES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/extern)
 include(catch2)
+
 include(warnings)
 set(SOURCE_FILES
         TestMain.cpp
@@ -15,10 +15,13 @@ set(SOURCE_FILES
         )
 
 add_executable(resulttypetests ${SOURCE_FILES})
-target_include_directories(resulttypetests
-                            PRIVATE ${CMAKE_SOURCE_DIR}/include
-                            SYSTEM ${EXTERN_CATCH_HEADER_DIR})
+
+
+target_link_libraries(resulttypetests PRIVATE cppresulttype_resulttype Catch2::Catch2)
+
 target_compile_options(resulttypetests PUBLIC ${WARNINGOPTS})
+
+
 add_test(
         NAME resulttypetests
         COMMAND resulttypetests
