@@ -34,6 +34,9 @@ namespace detail {
         using has_method_has_value = decltype(std::declval<std::remove_reference_t<T>>().has_value());
 
         template<class T>
+        using has_method_is_initialized = decltype(std::declval<std::remove_reference_t<T>>().is_initialized());
+
+        template<class T>
         using has_method_value_or = decltype(std::declval<std::remove_reference_t<T>>().value_or(std::declval<typename std::remove_reference_t<T>::value_type>()));
     }
 
@@ -65,13 +68,23 @@ using detected_or = detail::detector<Default, void, Op, Args...>;
     using has_method_value_or = is_detected<detail::has_method_value_or, T>;
 
     template<typename T, typename = void>
-    struct is_optional_type : std::false_type {};
+    struct is_std_optional_type : std::false_type {};
 
     template<typename T>
-    struct is_optional_type<T,
+    struct is_std_optional_type<T,
             std::void_t< detail::has_method_has_value<T>
                         ,detail::has_method_value_or<T>
             >
+    > : std::true_type {};
+
+    template<typename T, typename = void>
+    struct is_boost_optional_type : std::false_type {};
+    
+    template<typename T>
+    struct is_boost_optional_type<T,
+        std::void_t< detail::has_method_is_initialized<T>
+                    ,detail::has_method_value_or<T>
+        >
     > : std::true_type {};
 }
 #endif //CSV2XLS_TYPETRAITS_H

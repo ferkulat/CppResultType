@@ -6,13 +6,60 @@
 #define CPPRESULTTYPE_PIPEOPERATOR_CPP14_H
 #include <type_traits>
 #include <result_type/result.hpp>
-#include <type_traits>
+#include <result_type/typetraits.hpp>
+
+namespace result_type::detail{
+
+    template<typename ArgType, typename Callee, class ENABLER = void>
+    struct call;
+
+
+    template<typename Callee, typename ArgType>
+    using accepts = decltype(std::declval<Callee>()(std::declval<std::remove_reference_t<ArgType>>()));
+
+    template<typename Callee, typename ArgType, typename = void>
+    struct isInvokeable : std::false_type{};
+
+    template<typename Callee, typename ArgType>
+    struct isInvokeable<Callee, ArgType, std::void_t<accepts<Callee, ArgType>>>:std::true_type {};
+
+    template<typename Callee, typename ArgType, typename ReturnType, typename = void>
+    struct returns: std::false_type {};
+
+    template<typename Callee, typename ArgType, typename ReturnType>
+    struct returns<Callee, ArgType, ReturnType, std::void_t<std::is_same<decltype(std::declval<Callee>()(std::declval<std::remove_reference_t<ArgType>>())), ReturnType>>>:std::true_type {};
+
+
+
+
+
+
+    template<typename ArgType, typename Callee>
+    struct call<ArgType, Callee, std::enable_if_t<isInvokeable<Callee, ArgType>::value,void>>{
+        static auto with(ArgType&&arg, Callee&& callee){
+            return callee(std::forward<ArgType>(arg));
+        }
+    };
+
+    template<typename ArgType, typename Callee>
+    struct call<ArgType, Callee, std::enable_if_t<!isInvokeable<Callee, ArgType>::value && is_boost_optional_type<ArgType>::value && returns<Callee, typename ArgType::value_type, void>::value, void>>{
+        static auto with(ArgType&&arg, Callee&& callee){
+            if(arg.is_initialized()) {
+                callee(std::forward<ArgType>(arg).value());
+                return result_type::Optional<result_type::NothingType>(result_type::NothingType());
+            }
+            return result_type::Optional<result_type::NothingType>();
+        }
+    };
+}
+
+
+
 namespace result_type {
 
-  template<typename ArgType, typename Callee>
-  constexpr auto operator|(ArgType &&arg, Callee &&callee) {
-
-      return callee(std::forward<ArgType>(arg));
-  }
+    template<typename ArgType, typename Callee>
+    constexpr auto operator|(ArgType &&arg, Callee &&callee) {
+        return detail::call<ArgType, Callee>::with(std::forward<ArgType>(arg), std::forward<Callee>(callee));
+    }
 }
 #endif //CPPRESULTTYPE_PIPEOPERATOR_CPP14_H

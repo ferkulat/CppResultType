@@ -8,8 +8,8 @@
 #ifdef CPPRESULTTYPE_WITH_CPP14_PIPE
 #include <boost/optional.hpp>
 namespace result_type {
-  template<typename T>
-  using Optional = boost::optional<T>;
+    template<typename T>
+    using Optional = boost::optional<T>;
 
 }
 #include <result_type/pipeoperator_cpp14.hpp>

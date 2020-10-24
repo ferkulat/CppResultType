@@ -173,14 +173,12 @@ TEST_CASE("Piping when function is callable with piped value returns the same ty
   //REQUIRE(IsTrue(piping(Opt<int>{2}}, toFunction{[](ResOpt<int> val)->float{return val.CRefSuccess().value()+1.0f;}       }, returns<float>{3.0f}));
 
 }
-/*Marcel
-TEST_CASE("Piping std::optional<T> into a function which expects T")
-{
-    SECTION(" and returns 'void', returns std::optional<ResultType::NothingType>")
-    {
-        REQUIRE(IsTrue( piping(Opt<int>{1}), toFunction([](int) -> void {}), returns<Opt<NothingType> >{NothingType{}}));
-        REQUIRE(IsTrue( piping(Opt<int>{ }), toFunction([](int) -> void {}), returns<Opt<NothingType> >{}));
+TEST_CASE("Piping std::optional<T> into a function which expects T") {
+    SECTION(" and returns 'void', returns std::optional<ResultType::NothingType>") {
+        REQUIRE(IsTrue(piping(Opt<int>{1}), toFunction([](int) -> void {}), returns<Opt<NothingType> >{NothingType{}}));
+        REQUIRE(IsTrue(piping(Opt<int>{}), toFunction([](int) -> void {}), returns<Opt<NothingType> >{}));
     }
+}  /*Marcel
 
     SECTION(", wraps the function return type into std::optional")
     {

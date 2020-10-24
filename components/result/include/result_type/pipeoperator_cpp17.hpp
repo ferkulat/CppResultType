@@ -6,6 +6,7 @@
 #define CPPRESULTTYPE_PIPEOPERATOR_CPP17_HPP
 #include <result_type/result.hpp>
 #include <type_traits>
+#include <result_type/typetraits.hpp>
 
 
 namespace result_type {
@@ -22,7 +23,7 @@ namespace detail{
         else if constexpr (std::is_invocable_v<Callee,  typename std::remove_reference_t<OPT>::value_type>) {
             using CalleeReturnType = decltype(std::forward<Callee>(callee)(std::forward<OPT>(opt).value()));
 
-            if constexpr (is_optional_type<CalleeReturnType>::value) {
+            if constexpr (is_std_optional_type<CalleeReturnType>::value) {
                 if (opt.has_value()) {
                     return std::forward<Callee>(callee)(std::forward<OPT>(opt).value());
                 }
@@ -39,7 +40,7 @@ namespace detail{
             }
             else if constexpr (is_result_type<CalleeReturnType>::value){
                 using CalleeReturnSuccessType = typename CalleeReturnType::ResultSuccessType;
-                if constexpr (is_optional_type<CalleeReturnSuccessType>::value){
+                if constexpr (is_std_optional_type<CalleeReturnSuccessType>::value){
                     using ReturnType = CalleeReturnType;
                     return (opt.has_value())
                            ? std::forward<Callee>(callee)(std::forward<OPT>(opt).value())
@@ -101,7 +102,7 @@ namespace detail{
                        : ReturnType(std::forward<ArgType>(arg).Error());
             }
         }
-        else if constexpr (is_optional_type<ArgSuccessType>::value){
+        else if constexpr (is_std_optional_type<ArgSuccessType>::value){
             if constexpr (std::is_invocable_v<Callee, Result<typename ArgSuccessType::value_type, ErrorReturnType>>){
 //                using callee_return_type = decltype(std::forward<Callee>(callee)(std::forward<ArgType>(arg).Success().value()));
 //                using flattened_callee_return_type = decltype(callWithOptional( std::declval<ArgSuccessType>(),
@@ -119,7 +120,7 @@ namespace detail{
 
                 if constexpr (is_result_type<callee_return_type>::value){
                     using CalleeReturnSuccessType = typename callee_return_type::ResultSuccessType;
-                    if constexpr (is_optional_type<CalleeReturnSuccessType>::value){
+                    if constexpr (is_std_optional_type<CalleeReturnSuccessType>::value){
                         using ReturnType = Result<CalleeReturnSuccessType, ErrorReturnType>;
 
                         if (IsSuccess(arg)) {
@@ -174,7 +175,7 @@ namespace detail{
         else if constexpr (is_result_type<ArgType>::value) {
             return detail::callWithResult(std::forward<ArgType>(arg), std::forward<Callee>(callee));
         }
-        else if constexpr (is_optional_type<ArgType>::value) {
+        else if constexpr (is_std_optional_type<ArgType>::value) {
             return detail::callWithOptional(std::forward<ArgType>(arg), std::forward<Callee>(callee));
         }
         else {

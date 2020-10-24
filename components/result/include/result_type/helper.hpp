@@ -141,7 +141,7 @@ namespace result_type::helper::detail{
 
 namespace result_type::helper{
     template<typename T, typename U>
-    using enable_if_is_not_result_and_not_option = std::enable_if<!result_type::is_result_type<T>::value && !result_type::is_optional_type<T>::value, U>;
+    using enable_if_is_not_result_and_not_option = std::enable_if<!result_type::is_result_type<T>::value && !result_type::is_std_optional_type<T>::value, U>;
 
     template<typename T, typename U>
     using enable_if_is_not_result_and_not_option_t = typename enable_if_is_not_result_and_not_option<T,U>::type;
@@ -220,7 +220,7 @@ namespace helper_detail{
                 streamSuccessHelper(os, t.CRefSuccess());
             }
         }
-        else if constexpr (is_optional_type<T>::value){
+        else if constexpr (is_std_optional_type<T>::value){
             if(t.has_value()) {
                 streamSuccessHelper(os, t.value());
             }
