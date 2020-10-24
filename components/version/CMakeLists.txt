@@ -7,7 +7,7 @@ version_from_git(
 
 set(component cppresulttype_version)
 
-set(result_type_export_name version)
+set(${component}_export_name version)
 set(${component}_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/include)
 
 set(${component}_INCLUDE_FILE ${${component}_INCLUDE_DIR}/result_type/version/version.hpp)
@@ -18,7 +18,7 @@ configure_file(${CMAKE_CURRENT_LIST_DIR}/version.hpp.in
 
 add_library(${component} INTERFACE)
 
-add_library(${project}::${result_type_export_name} ALIAS ${component})
+add_library(${project}::${component}_export_name ALIAS ${component})
 
 target_include_directories(${component}
   INTERFACE

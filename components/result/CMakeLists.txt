@@ -1,15 +1,17 @@
 cmake_minimum_required(VERSION 3.11)
-set(component cppresulttype_resulttype)
 
+set(component cppresulttype_result)
+set(${component}_export_name result)
 
+set(${component}_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/include)
 add_library(${component}  INTERFACE)
 
-add_library(${project}::${component} ALIAS ${component})
+add_library(${project}::${${component}_export_name} ALIAS ${component})
 
 target_include_directories(${component}
         INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+        $<INSTALL_INTERFACE:include>
         )
 
 install(TARGETS ${component} EXPORT ${component}-targets
@@ -17,7 +19,7 @@ install(TARGETS ${component} EXPORT ${component}-targets
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib
         RUNTIME DESTINATION bin
-        INCLUDES DESTINATION components/${component}/include
+        INCLUDES DESTINATION include
         )
 
 install(EXPORT ${component}-targets

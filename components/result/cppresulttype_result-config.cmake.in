@@ -1,0 +1,1 @@
+include(${CMAKE_CURRENT_LIST_DIR}/cppresulttype-cppresulttype_result-config-version.cmake)

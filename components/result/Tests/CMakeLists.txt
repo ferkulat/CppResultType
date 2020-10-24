@@ -17,7 +17,7 @@ set(SOURCE_FILES
 add_executable(resulttypetests ${SOURCE_FILES})
 
 
-target_link_libraries(resulttypetests PRIVATE cppresulttype_resulttype Catch2::Catch2)
+target_link_libraries(resulttypetests PRIVATE cppresulttype_result Catch2::Catch2)
 
 target_compile_options(resulttypetests PUBLIC ${WARNINGOPTS})
 
