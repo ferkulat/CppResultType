@@ -16,9 +16,9 @@ struct DoesNotThrowWhenMoveConstructed{
 
 TEST_CASE("Given a Successtype that may throw when move constructed") {
 
-    CHECK_FALSE(std::is_nothrow_move_constructible_v<MayThrowWhenMoveConstructed>);
-    CHECK      (std::is_nothrow_move_constructible_v<DoesNotThrowWhenMoveConstructed>);
-    CHECK      (std::is_move_constructible_v<MayThrowWhenMoveConstructed>);
+    CHECK_FALSE(std::is_nothrow_move_constructible<MayThrowWhenMoveConstructed>::value);
+    CHECK      (std::is_nothrow_move_constructible<DoesNotThrowWhenMoveConstructed>::value);
+    CHECK      (std::is_move_constructible<MayThrowWhenMoveConstructed>::value);
 
 }
 
@@ -27,8 +27,8 @@ TEST_CASE("Given a type that may throw when move constructed, when part of Resul
     using ResultTypeSuccessThrows = result_type::Result<MayThrowWhenMoveConstructed, int>;
     using ResultTypeErrorThrows = result_type::Result<int, MayThrowWhenMoveConstructed>;
 
-    CHECK_FALSE(std::is_nothrow_move_constructible_v<ResultTypeSuccessThrows>);
-    CHECK_FALSE(std::is_nothrow_move_constructible_v<ResultTypeErrorThrows>);
+    CHECK_FALSE(std::is_nothrow_move_constructible<ResultTypeSuccessThrows>::value);
+    CHECK_FALSE(std::is_nothrow_move_constructible<ResultTypeErrorThrows>::value);
 
 }
 
@@ -38,8 +38,8 @@ TEST_CASE("Given a success type and error type, when both are nothrow_move_const
     using ResultTypeSuccessDoesNotThrow = result_type::Result<DoesNotThrowWhenMoveConstructed, int>;
     using ResultTypeErrorDoesNotThrow = result_type::Result<int, DoesNotThrowWhenMoveConstructed>;
 
-    CHECK(std::is_nothrow_move_constructible_v<ResultTypeSuccessDoesNotThrow>);
-    CHECK(std::is_nothrow_move_constructible_v<ResultTypeErrorDoesNotThrow>);
+    CHECK(std::is_nothrow_move_constructible<ResultTypeSuccessDoesNotThrow>::value);
+    CHECK(std::is_nothrow_move_constructible<ResultTypeErrorDoesNotThrow>::value);
 
 }
 

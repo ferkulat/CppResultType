@@ -5,6 +5,7 @@
 #include <type_traits>
 #include <catch2/catch.hpp>
 #include "result_type/pipeoperator.hpp"
+#include <result_type/helper.hpp>
 #include <tuple>
 
 enum class Error {
@@ -15,31 +16,31 @@ TEST_CASE("Given a tuple with at no member of type Result<S,E>, when passing thi
 {
     using MyType = std::tuple<float,int>;
 
-    CHECK_FALSE(result_type::detail::is_tuple_with_result<MyType>::value);
+    CHECK_FALSE(result_type::helper::detail::is_tuple_with_result<MyType>::value);
 }
 
 TEST_CASE("Given a tuple with at least one member of type Result<S,E>, when passing this type to ContainsResult, then ::value is true")
 {
     using MyType = std::tuple<int, result_type::Result<float, Error >, float>;
 
-    CHECK(result_type::detail::is_tuple_with_result<MyType>::value);
+    CHECK(result_type::helper::detail::is_tuple_with_result<MyType>::value);
 }
 
 TEST_CASE("Given a type that is not a tuple, when passing this type to ContainsResult, then ::value is false")
 {
     using MyType = std::tuple<float>;
 
-    CHECK_FALSE(result_type::detail::is_tuple_with_result<MyType>::value);
+    CHECK_FALSE(result_type::helper::detail::is_tuple_with_result<MyType>::value);
 }
 
 TEST_CASE("Given a type which is not Result<S,E>, when passing this type to success_type, then ::type is type")
 {
-    CHECK(std::is_same_v<result_type::detail::success_type<float>::type, float>);
+    CHECK(std::is_same_v<result_type::helper::detail::success_type<float>::type, float>);
 }
 
 TEST_CASE("Given a type which is Result<S,E>, when passing this type to success_type, then ::type is S")
 {
-    CHECK(std::is_same_v<result_type::detail::success_type<result_type::Result<float, Error >>::type, float>);
+    CHECK(std::is_same_v<result_type::helper::detail::success_type<result_type::Result<float, Error >>::type, float>);
 }
 
 TEST_CASE("Given a tuple<Result<S1,E>, Result<S2,E>>, when its members hold success, then it gets converted to  Result<std::tuple<S1, S2>,E>")

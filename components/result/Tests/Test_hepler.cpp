@@ -5,9 +5,8 @@
 #include <type_traits>
 #include <sstream>
 #include <catch2/catch.hpp>
-#include "result_type/pipeoperator.hpp"
+#include "result_type/helper.hpp"
 
-using result_type::operator|;
 using result_type::Result;
 using result_type::IsSuccess;
 using result_type::IsError;
