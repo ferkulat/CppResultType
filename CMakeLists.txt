@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.11)
 set (project cppresulttype)
 project(${project})
 
+message("CMAKE_CXX_COMPILER_ID ${CMAKE_CXX_COMPILER_ID}")
+message("CMAKE_CXX_PLATFORM_ID ${CMAKE_CXX_PLATFORM_ID}")
+message("CMAKE_CXX_COMPILER_VERSION ${CMAKE_CXX_COMPILER_VERSION}")
+
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
 include(gitversion)
