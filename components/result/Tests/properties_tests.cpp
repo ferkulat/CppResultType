@@ -2,7 +2,7 @@
 // Created by marcel on 2/27/20.
 //
 
-#include "result_type/result.h"
+#include "result_type/result.hpp"
 #include <catch2/catch.hpp>
 
 struct MayThrowWhenMoveConstructed{

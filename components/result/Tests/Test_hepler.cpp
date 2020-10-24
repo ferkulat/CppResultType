@@ -5,7 +5,7 @@
 #include <type_traits>
 #include <sstream>
 #include <catch2/catch.hpp>
-#include "result_type/result.h"
+#include "result_type/result.hpp"
 
 using result_type::operator|;
 using result_type::Result;

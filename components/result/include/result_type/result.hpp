@@ -7,7 +7,7 @@
 
 #include <variant>
 
-#include <result_type/typetraits.h>
+#include <result_type/typetraits.hpp>
 #include <optional>
 #include <tuple>
 #include <type_traits>

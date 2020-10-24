@@ -2,7 +2,7 @@
 // Created by marcel on 7/21/19.
 //
 #include <catch2/catch.hpp>
-#include "result_type/result.h"
+#include "result_type/result.hpp"
 template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
 template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 

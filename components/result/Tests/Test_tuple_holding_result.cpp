@@ -4,7 +4,7 @@
 
 #include <type_traits>
 #include <catch2/catch.hpp>
-#include "result_type/result.h"
+#include "result_type/result.hpp"
 #include <tuple>
 
 enum class Error {
