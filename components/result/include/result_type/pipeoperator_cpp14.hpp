@@ -53,11 +53,25 @@ namespace result_type::detail{
         }
 
         template<typename ArgType_, typename Callee_>
-        static auto with(ArgType_&&arg, Callee_&& callee)-> std::enable_if_t<!std::is_void<decltype(callee(std::forward<ArgType_>(arg).value()))>::value,result_type::Optional<decltype(callee(std::forward<ArgType_>(arg).value()))>>{
+        static auto with(ArgType_&&arg, Callee_&& callee)-> std::enable_if_t<
+                !std::is_void<decltype(callee(std::forward<ArgType_>(arg).value()))>::value
+                && !is_optional_type<decltype(callee(std::forward<ArgType_>(arg).value()))>::value
+        ,result_type::Optional<decltype(callee(std::forward<ArgType_>(arg).value()))>>{
             if(arg) {
                 return callee(std::forward<ArgType_>(arg).value());
             }
             return result_type::Optional<decltype(callee(std::forward<ArgType_>(arg).value()))>();
+        }
+
+        template<typename ArgType_, typename Callee_>
+        static auto with(ArgType_&&arg, Callee_&& callee)-> std::enable_if_t<
+                !std::is_void<decltype(callee(std::forward<ArgType_>(arg).value()))>::value
+                && is_optional_type<decltype(callee(std::forward<ArgType_>(arg).value()))>::value
+        ,decltype(callee(std::forward<ArgType_>(arg).value()))>{
+            if(arg) {
+                return callee(std::forward<ArgType_>(arg).value());
+            }
+            return decltype(callee(std::forward<ArgType_>(arg).value()))();
         }
     };
 }
