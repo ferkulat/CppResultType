@@ -86,5 +86,16 @@ using detected_or = detail::detector<Default, void, Op, Args...>;
                     ,detail::has_method_value_or<T>
         >
     > : std::true_type {};
+
+    template<typename T, typename = void>
+    struct is_optional_type : std::false_type {};
+
+    template<typename T>
+    struct is_optional_type<T,
+            std::enable_if_t<
+                    is_std_optional_type<T>::value || is_boost_optional_type<T>::value
+            , void>
+    > : std::true_type {};
+
 }
 #endif //CSV2XLS_TYPETRAITS_H

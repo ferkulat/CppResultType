@@ -29,11 +29,6 @@ namespace result_type::detail{
     template<typename Callee, typename ArgType, typename ReturnType>
     struct returns<Callee, ArgType, ReturnType, std::void_t<std::is_same<decltype(std::declval<Callee>()(std::declval<std::remove_reference_t<ArgType>>())), ReturnType>>>:std::true_type {};
 
-
-
-
-
-
     template<typename ArgType, typename Callee>
     struct call<ArgType, Callee, std::enable_if_t<isInvokeable<Callee, ArgType>::value,void>>{
         static auto with(ArgType&&arg, Callee&& callee){
@@ -42,13 +37,27 @@ namespace result_type::detail{
     };
 
     template<typename ArgType, typename Callee>
-    struct call<ArgType, Callee, std::enable_if_t<!isInvokeable<Callee, ArgType>::value && is_boost_optional_type<ArgType>::value && returns<Callee, typename ArgType::value_type, void>::value, void>>{
-        static auto with(ArgType&&arg, Callee&& callee){
-            if(arg.is_initialized()) {
-                callee(std::forward<ArgType>(arg).value());
+    struct call<ArgType, Callee, std::enable_if_t<
+            !isInvokeable<Callee, ArgType>::value
+            && is_optional_type<ArgType>::value
+            , void>>
+    {
+        // piping an Optional<T> to a function void f(T), returns Optional<result_type::NothingType>
+        template<typename ArgType_, typename Callee_>
+        static auto with(ArgType_&&arg, Callee_&& callee)-> std::enable_if_t<std::is_void<decltype(callee(std::forward<ArgType_>(arg).value()))>::value,result_type::Optional<result_type::NothingType>>{
+            if(arg) {
+                callee(std::forward<ArgType_>(arg).value());
                 return result_type::Optional<result_type::NothingType>(result_type::NothingType());
             }
             return result_type::Optional<result_type::NothingType>();
+        }
+
+        template<typename ArgType_, typename Callee_>
+        static auto with(ArgType_&&arg, Callee_&& callee)-> std::enable_if_t<!std::is_void<decltype(callee(std::forward<ArgType_>(arg).value()))>::value,result_type::Optional<decltype(callee(std::forward<ArgType_>(arg).value()))>>{
+            if(arg) {
+                return callee(std::forward<ArgType_>(arg).value());
+            }
+            return result_type::Optional<decltype(callee(std::forward<ArgType_>(arg).value()))>();
         }
     };
 }

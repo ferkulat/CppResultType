@@ -174,15 +174,20 @@ TEST_CASE("Piping when function is callable with piped value returns the same ty
 
 }
 TEST_CASE("Piping std::optional<T> into a function which expects T") {
-    SECTION(" and returns 'void', returns std::optional<ResultType::NothingType>") {
-        REQUIRE(IsTrue(piping(Opt<int>{1}), toFunction([](int) -> void {}), returns<Opt<NothingType> >{NothingType{}}));
-        REQUIRE(IsTrue(piping(Opt<int>{}), toFunction([](int) -> void {}), returns<Opt<NothingType> >{}));
+    SECTION(" and returns 'void', when optional<T> is empty, then it does not call the function and returns an empty std::optional<ResultType::NothingType>") {
+        bool called = false;
+        REQUIRE(IsTrue(piping(Opt<int>{}), toFunction([&called](int) -> void {called=true;}), returns<Opt<NothingType> >{}));
+        REQUIRE_FALSE(called);
     }
-}  /*Marcel
+    SECTION(" and returns 'void', when optional<T> is initialized, then it does call the function and returns an initialized std::optional<ResultType::NothingType>") {
+        bool called = false;
+        REQUIRE(IsTrue(piping(Opt<int>{1}), toFunction([&called](int) -> void {called=true;}), returns<Opt<NothingType> >{NothingType{}}));
+        REQUIRE(called);
+    }
 
-    SECTION(", wraps the function return type into std::optional")
-    {
-        REQUIRE(IsTrue( piping(Opt<int>{2}), toFunction([](int val)->float        {return float(val)+1.0f            ;} ), returns< Opt<float>    >{           3.0f } ));
+    SECTION(", wraps the function return type into std::optional") {
+        REQUIRE(IsTrue(piping(Opt<int>{2}), toFunction([](int val) -> float { return float(val) + 1.0f; }), returns<Opt<float> >{3.0f}));
+    } } /*Marcel
         REQUIRE(IsTrue( piping(Opt<int>{2}), toFunction([](int val)->Opt<float>   {return float(val)+1.0f            ;} ), returns< Opt<float>    >{           3.0f } ));
         REQUIRE(IsTrue( piping(Opt<int>{2}), toFunction([](int    )->Opt<float>   {return Opt<float>()               ;} ), returns< Opt<float>    >{                } ));
         REQUIRE(IsTrue( piping(Opt<int>{2}), toFunction([](int val)->Res<float>   {return float(val)+1.0f            ;} ), returns< ResOpt<float> >{Opt<float>{3.0f}} ));
