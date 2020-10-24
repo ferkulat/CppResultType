@@ -3,7 +3,7 @@
 //
 #include <type_traits>
 #include <catch2/catch.hpp>
-#include "result_type/result.hpp"
+#include "result_type/pipeoperator.hpp"
 
 using result_type::operator|;
 using result_type::Result;
