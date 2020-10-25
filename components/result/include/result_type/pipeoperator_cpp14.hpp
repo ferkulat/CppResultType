@@ -109,7 +109,6 @@ namespace result_type::detail{
         template<typename ArgType_, typename Callee_>
         static auto with(ArgType_&&arg, Callee_&& callee)-> std::enable_if_t<
                 !std::is_void<decltype(callee(std::forward<ArgType_>(arg).Success()))>::value
-                && !is_optional_type<decltype(callee(std::forward<ArgType_>(arg).Success()))>::value
                 && !is_result_type<decltype(callee(std::forward<ArgType_>(arg).Success()))>::value
                 ,detail::ReturnType_t<ArgType_, decltype(callee(std::forward<ArgType_>(arg).Success())) >>{
             //using ReturnType = detail::ReturnType_t<ArgType_, decltype(callee(std::forward<ArgType_>(arg).Success()))>;

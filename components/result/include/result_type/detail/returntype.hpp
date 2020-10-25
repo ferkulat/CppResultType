@@ -35,7 +35,6 @@ namespace result_type {
         struct ReturnTypeImpl<PipeInput, FunctionReturnType, std::enable_if_t<
                 is_result_type<PipeInput>::value
                 && !std::is_void<FunctionReturnType>::value
-                && !is_optional_type<FunctionReturnType>::value
                 && !is_result_type<FunctionReturnType>::value
                 , void>>
         {
