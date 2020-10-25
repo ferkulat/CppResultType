@@ -7,6 +7,7 @@
 #include <type_traits>
 #include <result_type/result.hpp>
 #include <result_type/typetraits.hpp>
+#include <result_type/detail/returntype.hpp>
 
 namespace result_type::detail{
 
@@ -36,6 +37,7 @@ namespace result_type::detail{
         }
     };
 
+
     template<typename ArgType, typename Callee>
     struct call<ArgType, Callee, std::enable_if_t<
             !isInvokeable<Callee, ArgType>::value
@@ -56,6 +58,7 @@ namespace result_type::detail{
         static auto with(ArgType_&&arg, Callee_&& callee)-> std::enable_if_t<
                 !std::is_void<decltype(callee(std::forward<ArgType_>(arg).value()))>::value
                 && !is_optional_type<decltype(callee(std::forward<ArgType_>(arg).value()))>::value
+                && !is_result_type<decltype(callee(std::forward<ArgType_>(arg).value()))>::value
         ,result_type::Optional<decltype(callee(std::forward<ArgType_>(arg).value()))>>{
             if(arg) {
                 return callee(std::forward<ArgType_>(arg).value());
@@ -73,8 +76,38 @@ namespace result_type::detail{
             }
             return decltype(callee(std::forward<ArgType_>(arg).value()))();
         }
+
+//        template<typename ArgType_, typename Callee_>
+//        static auto with(ArgType_&&arg, Callee_&& callee)-> std::enable_if_t<
+//                isResultTypeWithNonOptional<decltype(callee(std::forward<ArgType_>(arg).value()))>::value
+//                ,ReturnType_t<ArgType_, decltype(callee(std::forward<ArgType_>(arg).value()))>>{
+//            using ReturnType = ReturnType_t<ArgType_, decltype(callee(std::forward<ArgType_>(arg).value()))>;
+//            if(arg) {
+//                return callee(std::forward<ArgType_>(arg).value());
+//            }
+//            return ReturnType();
+//        }
     };
-}
+    template<typename ArgType, typename Callee>
+    struct call<ArgType, Callee, std::enable_if_t<
+            !isInvokeable<Callee, ArgType>::value
+            && is_result_type<ArgType>::value
+            , void>>
+    {
+        // piping a Result<T, E> to a function void f(T), returns Result<result_type::NothingType, E>
+        template<typename ArgType_, typename Callee_>
+        static auto with(ArgType_&&arg, Callee_&& callee)-> std::enable_if_t<std::is_void<decltype(callee(std::forward<ArgType_>(arg).Success()))>::value
+        ,detail::ReturnType_t<ArgType_, decltype(callee(std::forward<ArgType_>(arg).Success())) >>{
+            //using ReturnType = detail::ReturnType_t<ArgType_, decltype(callee(std::forward<ArgType_>(arg).Success()))>;
+            if (IsSuccess(arg)){
+                callee(std::forward<ArgType_>(arg).Success());
+                return NothingType();
+            }
+            return std::forward<ArgType_>(arg).Error();
+        }
+
+    };
+    }
 
 
 

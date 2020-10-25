@@ -6,6 +6,7 @@
 #define CSV2XLS_TYPETRAITS_H
 
 #include <type_traits>
+#include <result_type/optional.hpp>
 namespace result_type {
 namespace detail {
     template <class Default, class AlwaysVoid,
@@ -96,6 +97,17 @@ using detected_or = detail::detector<Default, void, Op, Args...>;
                     is_std_optional_type<T>::value || is_boost_optional_type<T>::value
             , void>
     > : std::true_type {};
+
+
+    template <typename T, typename = void>
+    struct isResultTypeWithNonOptional:std::false_type {};
+    template <typename T>
+    struct isResultTypeWithNonOptional<T, std::enable_if_t<
+            is_result_type<T>::value
+            && !is_optional_type<typename T::ResultSuccessType>::value
+            , void>>:std::true_type {};
+
+
 
 }
 #endif //CSV2XLS_TYPETRAITS_H

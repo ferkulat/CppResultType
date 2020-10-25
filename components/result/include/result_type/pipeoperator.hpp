@@ -4,14 +4,8 @@
 
 #ifndef CPPRESULTTYPE_PIPEOPERATOR_H
 #define CPPRESULTTYPE_PIPEOPERATOR_H
-
+#include <result_type/optional.hpp>
 #ifdef CPPRESULTTYPE_WITH_CPP14_PIPE
-#include <boost/optional.hpp>
-namespace result_type {
-    template<typename T>
-    using Optional = boost::optional<T>;
-
-}
 #include <result_type/pipeoperator_cpp14.hpp>
 #else
 namespace result_type {

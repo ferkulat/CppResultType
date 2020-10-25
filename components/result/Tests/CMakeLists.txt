@@ -30,3 +30,6 @@ add_test(
         NAME resulttypetests
         COMMAND resulttypetests
 )
+
+
+add_subdirectory(typetraits)
