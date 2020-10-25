@@ -84,4 +84,31 @@ SCENARIO("Testing ReturnType_t"){
             }
         }
     }
+    GIVEN("a Result<Optional<<T>,E>"){
+        using PipedType = Result<Optional<int>, ErrorType>;
+        WHEN("piping into a function F(T)->void"){
+            using FunctionReturnType = void;
+            THEN("the return type is of type Result<Optional<NothingType>, E>"){
+                using expected = Result<Optional<NothingType>, ErrorType>;
+                using actual   = ReturnType_t<PipedType, FunctionReturnType>;
+                REQUIRE(std::is_same<expected, actual>::value);
+            }
+        }
+        WHEN("piping into a function F(T)->U"){
+            using FunctionReturnType = double;
+            THEN("the return type is of type Result<NothingType, E>"){
+                using expected = Result<Optional<double>, ErrorType>;
+                using actual   = ReturnType_t<PipedType, FunctionReturnType>;
+                REQUIRE(std::is_same<expected, actual>::value);
+            }
+        }
+        WHEN("piping into a function F(T)->U"){
+            using FunctionReturnType = double;
+            THEN("the return type is of type Result<NothingType, E>"){
+                using expected = Result<Optional<double>, ErrorType>;
+                using actual   = ReturnType_t<PipedType, FunctionReturnType>;
+                REQUIRE(std::is_same<expected, actual>::value);
+            }
+        }
+    }
 }

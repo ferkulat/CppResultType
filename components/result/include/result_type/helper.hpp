@@ -146,19 +146,6 @@ namespace result_type::helper{
     template<typename T, typename U>
     using enable_if_is_not_result_and_not_option_t = typename enable_if_is_not_result_and_not_option<T,U>::type;
 
-    template<typename ValueType, typename... ErrorType> struct value_type_of{
-        using type = ValueType;
-    };
-
-    template<typename S> struct value_type_of<std::optional<S>>{
-    using type = S;
-};
-
-template<typename S, typename... E> struct value_type_of<result_type::Result<S,E...>>{
-using type = typename value_type_of<S>::type;
-};
-template <typename T>
-using value_type_of_t = typename value_type_of<T>::type;
 
 template<typename Tuple>
 constexpr auto success_tuple_or_err(Tuple &&tuple) {

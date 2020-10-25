@@ -125,7 +125,7 @@ namespace result_type::detail{
     template<typename ArgType, typename Callee>
     struct call<ArgType, Callee, std::enable_if_t<
             !isInvokeable<Callee, ArgType>::value
-            && is_result_type<ArgType>::value
+            && isResultTypeWithNonOptional<ArgType>::value
             , void>>
     {
         // piping a Result<T, E> to a function void f(T), returns Result<result_type::NothingType, E>
@@ -160,6 +160,25 @@ namespace result_type::detail{
             }
             return std::forward<ResultArgType>(result_arg).Error();
         }
+    };
+
+    template<typename ArgType, typename Callee>
+    struct call<ArgType, Callee, std::enable_if_t<
+            !isInvokeable<Callee, ArgType>::value
+            && isResultTypeWithOptional<ArgType>::value
+            , void>> {
+
+        template<typename ResultOptArgType, typename Callee_>
+        static auto with(ResultOptArgType&&result_opt_arg, Callee_&& callee)-> std::enable_if_t<
+                true
+                ,detail::ReturnType_t<ResultOptArgType, decltype(callee(std::forward<ResultOptArgType>(result_opt_arg).Success().value())) >>{
+            if (IsSuccess(result_opt_arg)){
+                using result_type::operator|;
+                return std::forward<ResultOptArgType>(result_opt_arg).Success() |std::forward<Callee_>(callee);
+            }
+            return std::forward<ResultOptArgType>(result_opt_arg).Error();
+        }
+
     };
     }
 

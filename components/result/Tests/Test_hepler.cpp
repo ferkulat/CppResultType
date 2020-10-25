@@ -6,6 +6,7 @@
 #include <sstream>
 #include <catch2/catch.hpp>
 #include "result_type/helper.hpp"
+#include <result_type/detail/value_type_of.hpp>
 
 using result_type::Result;
 using result_type::IsSuccess;
@@ -41,9 +42,9 @@ TEST_CASE("enable_if its not Result and not an optional"){
 
 TEST_CASE("extract the value type of Result and optional") {
 
-    CHECK(std::is_same_v<result_type::helper::value_type_of_t<double>                              , double>);
-    CHECK(std::is_same_v<result_type::helper::value_type_of_t<std::optional<double>>               , double>);
-    CHECK(std::is_same_v<result_type::helper::value_type_of_t<Result<double, Error>>               , double>);
-    CHECK(std::is_same_v<result_type::helper::value_type_of_t<Result<std::optional<double>, Error>>, double>);
+    CHECK(std::is_same_v<result_type::detail::value_type_of_t<double>                              , double>);
+    CHECK(std::is_same_v<result_type::detail::value_type_of_t<std::optional<double>>               , double>);
+    CHECK(std::is_same_v<result_type::detail::value_type_of_t<Result<double, Error>>               , double>);
+    CHECK(std::is_same_v<result_type::detail::value_type_of_t<Result<std::optional<double>, Error>>, double>);
 
 }

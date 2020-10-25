@@ -8,6 +8,7 @@
 #include <result_type/typetraits.hpp>
 #include <result_type/optional.hpp>
 #include <result_type/result.hpp>
+#include <result_type/detail/value_type_of.hpp>
 
 namespace result_type {
     namespace detail{
@@ -32,7 +33,7 @@ namespace result_type {
 
         template<typename PipeInput, typename FunctionReturnType>
         struct ReturnTypeImpl<PipeInput, FunctionReturnType, std::enable_if_t<
-                is_result_type<PipeInput>::value
+                isResultTypeWithNonOptional<PipeInput>::value
                 && std::is_void<FunctionReturnType>::value
                 , void>>
         {
@@ -41,7 +42,7 @@ namespace result_type {
 
         template<typename PipeInput, typename FunctionReturnType>
         struct ReturnTypeImpl<PipeInput, FunctionReturnType, std::enable_if_t<
-                is_result_type<PipeInput>::value
+                isResultTypeWithNonOptional<PipeInput>::value
                 && !std::is_void<FunctionReturnType>::value
                 && !is_result_type<FunctionReturnType>::value
                 , void>>
@@ -51,11 +52,27 @@ namespace result_type {
 
         template<typename PipeInput, typename FunctionReturnType>
         struct ReturnTypeImpl<PipeInput, FunctionReturnType, std::enable_if_t<
-                is_result_type<PipeInput>::value
+                isResultTypeWithNonOptional<PipeInput>::value
                 && is_result_type<FunctionReturnType>::value
                 , void>>
         {
             using type = FunctionReturnType;
+        };
+        template<typename PipeInput, typename FunctionReturnType>
+        struct ReturnTypeImpl<PipeInput, FunctionReturnType, std::enable_if_t<
+                isResultTypeWithOptional<PipeInput>::value
+                && std::is_void<FunctionReturnType>::value
+                , void>>
+        {
+            using type = Result<Optional<NothingType>, typename PipeInput::ResultErrorType>;
+        };
+        template<typename PipeInput, typename FunctionReturnType>
+        struct ReturnTypeImpl<PipeInput, FunctionReturnType, std::enable_if_t<
+                isResultTypeWithOptional<PipeInput>::value
+                && !std::is_void<FunctionReturnType>::value
+                , void>>
+        {
+            using type = Result<Optional<detail::value_type_of_t<FunctionReturnType>>, typename PipeInput::ResultErrorType>;
         };
 
         template<typename PipeInput, typename FunctionReturnType>
