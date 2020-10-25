@@ -202,24 +202,24 @@ TEST_CASE("Piping std::optional<T> into a function which expects T") {
     }
 }
 
-//TEST_CASE("Piping std::optional<T> into a function which expects Result<T, E>,  wraps the function return type into std::optional")
-//{
-//    REQUIRE(IsTrue( piping(Opt<int>{1}), toFunction([](Res<int>    )->void         {                              }                    ), returns< Opt<NothingType> >{NothingType{}   } ));
-//    REQUIRE(IsTrue( piping(Opt<int>{2}), toFunction([](Res<int> val)->float        {return float(val.CRefSuccess())+1.0f;}             ), returns< Opt<float>       >{           3.0f } ));
-//    REQUIRE(IsTrue( piping(Opt<int>{2}), toFunction([](Res<int> val)->Opt<float>   {return float(val.CRefSuccess())+1.0f;}             ), returns< Opt<float>       >{           3.0f } ));
-//    REQUIRE(IsTrue( piping(Opt<int>{2}), toFunction([](Res<int>    )->Opt<float>   {return std::nullopt          ;}                    ), returns< Opt<float>       >{                } ));
-//    REQUIRE(IsTrue( piping(Opt<int>{2}), toFunction([](Res<int> val)->Res<float>   {return float(val.CRefSuccess())+1.0f;}             ), returns< ResOpt<float>    >{Opt<float>{3.0f}} ));
-//    REQUIRE(IsTrue( piping(Opt<int>{2}), toFunction([](Res<int>    )->Res<float>   {return Error::Fail1          ;}                    ), returns< ResOpt<float>    >{Error::Fail1    } ));
-//    REQUIRE(IsTrue( piping(Opt<int>{2}), toFunction([](Res<int> val)->ResOpt<float>{return Opt<float>{float(val.CRefSuccess())+1.0f};} ), returns< ResOpt<float>    >{Opt<float>{3.0f}} ));
-//    REQUIRE(IsTrue( piping(Opt<int>{2}), toFunction([](Res<int>    )->ResOpt<float>{return Opt<float>{}          ;}                    ), returns< ResOpt<float>    >{Opt<float>{}    } ));
-//    REQUIRE(IsTrue( piping(Opt<int>{2}), toFunction([](Res<int>    )->ResOpt<float>{return Error::Fail1          ;}                    ), returns< ResOpt<float>    >{Error::Fail1    } ));
-//
-//    REQUIRE(IsTrue( piping(Opt<int>{ }), toFunction([](Res<int>    )->void         {                                     }             ), returns< Opt<NothingType> >{}                 ));
-//    REQUIRE(IsTrue( piping(Opt<int>{ }), toFunction([](Res<int> val)->float        {return float(val.CRefSuccess())+1.0f;}             ), returns< Opt<float>       >{}                 ));
-//    REQUIRE(IsTrue( piping(Opt<int>{ }), toFunction([](Res<int> val)->Opt<float>   {return float(val.CRefSuccess())+1.0f;}             ), returns< Opt<float>       >{}                 ));
-//    REQUIRE(IsTrue( piping(Opt<int>{ }), toFunction([](Res<int> val)->Res<float>   {return float(val.CRefSuccess())+1.0f;}             ), returns< ResOpt<float>    >{Opt<float>{}}     ));
-//    REQUIRE(IsTrue( piping(Opt<int>{ }), toFunction([](Res<int> val)->ResOpt<float>{return Opt<float>{float(val.CRefSuccess())+1.0f};} ), returns< ResOpt<float>    >{Opt<float>{}}     ));
-//}
+TEST_CASE("Piping std::optional<T> into a function which expects Result<T, E>,  wraps the function return type into std::optional")
+{
+    REQUIRE(IsTrue( piping(Opt<int>{1}), toFunction([](Res<int>    )->void         {                              }                    ), returns< Opt<NothingType> >{NothingType{}   } ));
+    REQUIRE(IsTrue( piping(Opt<int>{2}), toFunction([](Res<int> val)->float        {return float(val.CRefSuccess())+1.0f;}             ), returns< Opt<float>       >{           3.0f } ));
+    REQUIRE(IsTrue( piping(Opt<int>{2}), toFunction([](Res<int> val)->Opt<float>   {return float(val.CRefSuccess())+1.0f;}             ), returns< Opt<float>       >{           3.0f } ));
+    REQUIRE(IsTrue( piping(Opt<int>{2}), toFunction([](Res<int>    )->Opt<float>   {return NullOpt                      ;}             ), returns< Opt<float>       >{                } ));
+    REQUIRE(IsTrue( piping(Opt<int>{2}), toFunction([](Res<int> val)->Res<float>   {return float(val.CRefSuccess())+1.0f;}             ), returns< ResOpt<float>    >{Opt<float>{3.0f}} ));
+    REQUIRE(IsTrue( piping(Opt<int>{2}), toFunction([](Res<int>    )->Res<float>   {return Error::Fail1          ;}                    ), returns< ResOpt<float>    >{Error::Fail1    } ));
+    REQUIRE(IsTrue( piping(Opt<int>{2}), toFunction([](Res<int> val)->ResOpt<float>{return Opt<float>{float(val.CRefSuccess())+1.0f};} ), returns< ResOpt<float>    >{Opt<float>{3.0f}} ));
+    REQUIRE(IsTrue( piping(Opt<int>{2}), toFunction([](Res<int>    )->ResOpt<float>{return Opt<float>{}          ;}                    ), returns< ResOpt<float>    >{Opt<float>{}    } ));
+    REQUIRE(IsTrue( piping(Opt<int>{2}), toFunction([](Res<int>    )->ResOpt<float>{return Error::Fail1          ;}                    ), returns< ResOpt<float>    >{Error::Fail1    } ));
+
+    REQUIRE(IsTrue( piping(Opt<int>{ }), toFunction([](Res<int>    )->void         {                                     }             ), returns< Opt<NothingType> >{}                 ));
+    REQUIRE(IsTrue( piping(Opt<int>{ }), toFunction([](Res<int> val)->float        {return float(val.CRefSuccess())+1.0f;}             ), returns< Opt<float>       >{}                 ));
+    REQUIRE(IsTrue( piping(Opt<int>{ }), toFunction([](Res<int> val)->Opt<float>   {return float(val.CRefSuccess())+1.0f;}             ), returns< Opt<float>       >{}                 ));
+    REQUIRE(IsTrue( piping(Opt<int>{ }), toFunction([](Res<int> val)->Res<float>   {return float(val.CRefSuccess())+1.0f;}             ), returns< ResOpt<float>    >{Opt<float>{}}     ));
+    REQUIRE(IsTrue( piping(Opt<int>{ }), toFunction([](Res<int> val)->ResOpt<float>{return Opt<float>{float(val.CRefSuccess())+1.0f};} ), returns< ResOpt<float>    >{Opt<float>{}}     ));
+}
 
 SCENARIO("Piping Result<T, E> into a function which expects T,  wraps the function return type into Result.")
 {
@@ -254,27 +254,27 @@ SCENARIO("Piping Result<T, E> into a function which expects T,  wraps the functi
 //    REQUIRE(IsTrue(piping(Res<int>{Error::NotOdd}), toFunction([](int val)->Res<float>   {return float(val)+1.0f;}             ), returns< Res<float>       >{Error::NotOdd}    ));
 //    REQUIRE(IsTrue(piping(Res<int>{Error::NotOdd}), toFunction([](int val)->ResOpt<float>{return Opt<float>{float(val)+1.0f};} ), returns< ResOpt<float>    >{Error::NotOdd}    ));
 }
-/*
+
 TEST_CASE("Piping Result<T, E> into a function which expects std::optional<T>,  wraps the function return type into Result")
 {
     REQUIRE(IsTrue(piping(Res<int>{1})            , toFunction([](Opt<int>    )->void         {}                                            ), returns< Res<NothingType> >{NothingType{}   } ));
     REQUIRE(IsTrue(piping(Res<int>{2})            , toFunction([](Opt<int> val)->float        {return float(val.value())+1.0f;}             ), returns< Res<float>       >{           3.0f } ));
     REQUIRE(IsTrue(piping(Res<int>{2})            , toFunction([](Opt<int> val)->Opt<float>   {return float(val.value())+1.0f;}             ), returns< ResOpt<float>    >{Opt<float>{3.0f}} ));
-    REQUIRE(IsTrue(piping(Res<int>{2})            , toFunction([](Opt<int>    )->Opt<float>   {return std::nullopt    ;}                    ), returns< ResOpt<float>    >{Opt<float>{}    } ));
-    REQUIRE(IsTrue(piping(Res<int>{2})            , toFunction([](Opt<int> val)->Res<float>   {return float(val.value())+1.0f;}             ), returns< Res<float>       >{           3.0f } ));
-    REQUIRE(IsTrue(piping(Res<int>{2})            , toFunction([](Opt<int>    )->Res<float>   {return Error::Fail1    ;}                    ), returns< Res<float>       >{Error::Fail1    } ));
-    REQUIRE(IsTrue(piping(Res<int>{2})            , toFunction([](Opt<int> val)->ResOpt<float>{return Opt<float>{float(val.value())+1.0f};} ), returns< ResOpt<float>    >{Opt<float>{3.0f}} ));
-    REQUIRE(IsTrue(piping(Res<int>{2})            , toFunction([](Opt<int>    )->ResOpt<float>{return Opt<float>{}                       ;} ), returns< ResOpt<float>    >{Opt<float>{}    } ));
-    REQUIRE(IsTrue(piping(Res<int>{2})            , toFunction([](Opt<int>    )->ResOpt<float>{return Error::Fail1                       ;} ), returns< ResOpt<float>    >{Error::Fail1    } ));
-
+    REQUIRE(IsTrue(piping(Res<int>{2})            , toFunction([](Opt<int>    )->Opt<float>   {return NullOpt                ;}             ), returns< ResOpt<float>    >{Opt<float>{}    } ));
+//    REQUIRE(IsTrue(piping(Res<int>{2})            , toFunction([](Opt<int> val)->Res<float>   {return float(val.value())+1.0f;}             ), returns< Res<float>       >{           3.0f } ));
+//    REQUIRE(IsTrue(piping(Res<int>{2})            , toFunction([](Opt<int>    )->Res<float>   {return Error::Fail1    ;}                    ), returns< Res<float>       >{Error::Fail1    } ));
+//    REQUIRE(IsTrue(piping(Res<int>{2})            , toFunction([](Opt<int> val)->ResOpt<float>{return Opt<float>{float(val.value())+1.0f};} ), returns< ResOpt<float>    >{Opt<float>{3.0f}} ));
+//    REQUIRE(IsTrue(piping(Res<int>{2})            , toFunction([](Opt<int>    )->ResOpt<float>{return Opt<float>{}                       ;} ), returns< ResOpt<float>    >{Opt<float>{}    } ));
+//    REQUIRE(IsTrue(piping(Res<int>{2})            , toFunction([](Opt<int>    )->ResOpt<float>{return Error::Fail1                       ;} ), returns< ResOpt<float>    >{Error::Fail1    } ));
+//
     REQUIRE(IsTrue(piping(Res<int>{Error::NotOdd}), toFunction([](Opt<int>    )->void         {}                                            ), returns< Res<NothingType> >{Error::NotOdd}    ));
     REQUIRE(IsTrue(piping(Res<int>{Error::NotOdd}), toFunction([](Opt<int> val)->float        {return float(val.value())+1.0f;}             ), returns< Res<float>       >{Error::NotOdd}    ));
     REQUIRE(IsTrue(piping(Res<int>{Error::NotOdd}), toFunction([](Opt<int> val)->Opt<float>   {return float(val.value())+1.0f;}             ), returns< ResOpt<float>    >{Error::NotOdd}    ));
-    REQUIRE(IsTrue(piping(Res<int>{Error::NotOdd}), toFunction([](Opt<int> val)->Res<float>   {return float(val.value())+1.0f;}             ), returns< Res<float>       >{Error::NotOdd}    ));
-    REQUIRE(IsTrue(piping(Res<int>{Error::NotOdd}), toFunction([](Opt<int> val)->ResOpt<float>{return Opt<float>{float(val.value())+1.0f};} ), returns< ResOpt<float>    >{Error::NotOdd}    ));
+//    REQUIRE(IsTrue(piping(Res<int>{Error::NotOdd}), toFunction([](Opt<int> val)->Res<float>   {return float(val.value())+1.0f;}             ), returns< Res<float>       >{Error::NotOdd}    ));
+//    REQUIRE(IsTrue(piping(Res<int>{Error::NotOdd}), toFunction([](Opt<int> val)->ResOpt<float>{return Opt<float>{float(val.value())+1.0f};} ), returns< ResOpt<float>    >{Error::NotOdd}    ));
 }
 
-
+/*
 TEST_CASE("Piping Result<std::optional<T>, E> into a function which expects T,  wraps the function return type into Result")
 {
     REQUIRE(IsTrue(piping(ResOpt<int>{1})            , toFunction([](int    )->void         {}                                    ), returns< ResOpt<NothingType> >{Opt<NothingType>{NothingType{}}} ));
