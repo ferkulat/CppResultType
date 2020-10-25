@@ -8,6 +8,11 @@
 #include <result_type/result.hpp>
 #include <result_type/typetraits.hpp>
 #include <result_type/detail/returntype.hpp>
+namespace result_type {
+
+    template<typename ArgType, typename Callee>
+    constexpr auto operator|(ArgType &&arg, Callee &&callee);
+}
 
 namespace result_type::detail{
 
@@ -36,6 +41,13 @@ namespace result_type::detail{
             return callee(std::forward<ArgType>(arg));
         }
     };
+
+        template<typename T>
+        struct intoOptional{
+            auto operator()(T&&t){
+                return Optional<T>(std::forward<T>(t));
+            }
+        };
 
 
     template<typename ArgType, typename Callee>
@@ -77,16 +89,22 @@ namespace result_type::detail{
             return decltype(callee(std::forward<OptArgType>(opt_arg).value()))();
         }
 
-//        template<typename ArgType_, typename Callee_>
-//        static auto with(ArgType_&&arg, Callee_&& callee)-> std::enable_if_t<
-//                isResultTypeWithNonOptional<decltype(callee(std::forward<ArgType_>(arg).value()))>::value
-//                ,ReturnType_t<ArgType_, decltype(callee(std::forward<ArgType_>(arg).value()))>>{
-//            using ReturnType = ReturnType_t<ArgType_, decltype(callee(std::forward<ArgType_>(arg).value()))>;
-//            if(arg) {
-//                return callee(std::forward<ArgType_>(arg).value());
-//            }
-//            return ReturnType();
-//        }
+        template<typename OptArgType, typename Callee_>
+        static auto with(OptArgType&&opt_arg, Callee_&& callee)-> std::enable_if_t<
+                isResultTypeWithNonOptional<decltype(callee(std::forward<OptArgType>(opt_arg).value()))>::value
+                ,ReturnType_t<OptArgType, decltype(callee(std::forward<OptArgType>(opt_arg).value()))>>{
+            using CalleeReturnType = decltype(callee(std::forward<OptArgType>(opt_arg).value()));
+            using CalleeSuccesType = typename CalleeReturnType::ResultSuccessType;
+            if(opt_arg){
+                using result_type::operator|;
+                return std::forward<OptArgType>(opt_arg).value()
+                        | std::forward<Callee_>(callee)
+                        | intoOptional<CalleeSuccesType>{}
+                        ;
+            }
+            using ReturnType = ReturnType_t<OptArgType, decltype(callee(std::forward<OptArgType>(opt_arg).value()))>;
+            return ReturnType(Optional<CalleeSuccesType>());
+        }
     };
     template<typename ArgType, typename Callee>
     struct call<ArgType, Callee, std::enable_if_t<
