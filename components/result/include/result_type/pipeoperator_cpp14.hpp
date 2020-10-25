@@ -92,7 +92,7 @@ namespace result_type::detail{
         template<typename OptArgType, typename Callee_>
         static auto with(OptArgType&&opt_arg, Callee_&& callee)-> std::enable_if_t<
                 isResultTypeWithNonOptional<decltype(callee(std::forward<OptArgType>(opt_arg).value()))>::value
-                ,ReturnType_t<OptArgType, decltype(callee(std::forward<OptArgType>(opt_arg).value()))>>{
+                ,ReturnType_t<OptArgType, Callee_, decltype(callee(std::forward<OptArgType>(opt_arg).value()))>>{
             using CalleeReturnType = decltype(callee(std::forward<OptArgType>(opt_arg).value()));
             using CalleeSuccesType = typename CalleeReturnType::ResultSuccessType;
             if(opt_arg){
@@ -102,14 +102,14 @@ namespace result_type::detail{
                         | intoOptional<CalleeSuccesType>{}
                         ;
             }
-            using ReturnType = ReturnType_t<OptArgType, decltype(callee(std::forward<OptArgType>(opt_arg).value()))>;
+            using ReturnType = ReturnType_t<OptArgType, Callee_, decltype(callee(std::forward<OptArgType>(opt_arg).value()))>;
             return ReturnType(Optional<CalleeSuccesType>());
         }
 
         template<typename OptArgType, typename Callee_>
         static auto with(OptArgType&&opt_arg, Callee_&& callee)-> std::enable_if_t<
                 isResultTypeWithOptional<decltype(callee(std::forward<OptArgType>(opt_arg).value()))>::value
-                ,ReturnType_t<OptArgType, decltype(callee(std::forward<OptArgType>(opt_arg).value()))>>{
+                ,ReturnType_t<OptArgType, Callee_, decltype(callee(std::forward<OptArgType>(opt_arg).value()))>>{
             if(opt_arg){
                 using result_type::operator|;
                 return std::forward<OptArgType>(opt_arg).value()
@@ -131,7 +131,7 @@ namespace result_type::detail{
         // piping a Result<T, E> to a function void f(T), returns Result<result_type::NothingType, E>
         template<typename ResultArgType, typename Callee_>
         static auto with(ResultArgType&&result_arg, Callee_&& callee)-> std::enable_if_t<std::is_void<decltype(callee(std::forward<ResultArgType>(result_arg).Success()))>::value
-        ,detail::ReturnType_t<ResultArgType, decltype(callee(std::forward<ResultArgType>(result_arg).Success())) >>{
+        ,detail::ReturnType_t<ResultArgType, Callee_, decltype(callee(std::forward<ResultArgType>(result_arg).Success())) >>{
             if (IsSuccess(result_arg)){
                 callee(std::forward<ResultArgType>(result_arg).Success());
                 return NothingType();
@@ -143,7 +143,7 @@ namespace result_type::detail{
         static auto with(ResultArgType&&result_arg, Callee_&& callee)-> std::enable_if_t<
                 !std::is_void<decltype(callee(std::forward<ResultArgType>(result_arg).Success()))>::value
                 && !is_result_type<decltype(callee(std::forward<ResultArgType>(result_arg).Success()))>::value
-                ,detail::ReturnType_t<ResultArgType, decltype(callee(std::forward<ResultArgType>(result_arg).Success())) >>{
+                ,detail::ReturnType_t<ResultArgType, Callee_, decltype(callee(std::forward<ResultArgType>(result_arg).Success())) >>{
             if (IsSuccess(result_arg)){
                 return callee(std::forward<ResultArgType>(result_arg).Success());
             }
@@ -154,7 +154,7 @@ namespace result_type::detail{
         template<typename ResultArgType, typename Callee_>
         static auto with(ResultArgType&&result_arg, Callee_&& callee)-> std::enable_if_t<
                 is_result_type<decltype(callee(std::forward<ResultArgType>(result_arg).Success()))>::value
-                ,detail::ReturnType_t<ResultArgType, decltype(callee(std::forward<ResultArgType>(result_arg).Success())) >>{
+                ,detail::ReturnType_t<ResultArgType, Callee_, decltype(callee(std::forward<ResultArgType>(result_arg).Success())) >>{
             if (IsSuccess(result_arg)){
                 return callee(std::forward<ResultArgType>(result_arg).Success());
             }
@@ -171,7 +171,7 @@ namespace result_type::detail{
         template<typename ResultOptArgType, typename Callee_>
         static auto with(ResultOptArgType&&result_opt_arg, Callee_&& callee)-> std::enable_if_t<
                 true
-                ,detail::ReturnType_t<ResultOptArgType, decltype(callee(std::forward<ResultOptArgType>(result_opt_arg).Success().value())) >>{
+                ,detail::ReturnType_t<ResultOptArgType, Callee_, decltype(callee(std::forward<ResultOptArgType>(result_opt_arg).Success().value())) >>{
             if (IsSuccess(result_opt_arg)){
                 using result_type::operator|;
                 return std::forward<ResultOptArgType>(result_opt_arg).Success() |std::forward<Callee_>(callee);
