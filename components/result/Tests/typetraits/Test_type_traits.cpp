@@ -18,6 +18,16 @@ TEST_SUITE("Testing isResultTypeWithNonOptional"){
         REQUIRE(result_type::isResultTypeWithNonOptional<InputType>::value);
     }
 }
+TEST_SUITE("Testing isResultTypeWithOptional"){
+    TEST_CASE("passing Result<Optional<int>, ErrorType>, returns false"){
+        using InputType = result_type::Result<Optional<int>,  ErrorType>;
+        REQUIRE(result_type::isResultTypeWithOptional<InputType>::value);
+    }
+    TEST_CASE("passing Result<int, ErrorType>, returns true"){
+        using InputType = Result< int,  ErrorType>;
+        REQUIRE_FALSE(result_type::isResultTypeWithOptional<InputType>::value);
+    }
+}
 
 SCENARIO("Testing ReturnType_t"){
     using result_type::detail::ReturnType_t;
@@ -25,6 +35,14 @@ SCENARIO("Testing ReturnType_t"){
         using PipedType = Optional<int>;
         WHEN("piping into a function F(T)->Result<S, E>"){
             using FunctionReturnType = Result<double, ErrorType>;
+            THEN("the return type is of type Result<Optional<S>, E>"){
+                using expected = Result<Optional<double>, ErrorType>;
+                using actual   = ReturnType_t<PipedType, FunctionReturnType>;
+                REQUIRE(std::is_same<expected, actual>::value);
+            }
+        }
+        WHEN("piping into a function F(T)->Result<Optional<S>, E>"){
+            using FunctionReturnType = Result<Optional<double>, ErrorType>;
             THEN("the return type is of type Result<Optional<S>, E>"){
                 using expected = Result<Optional<double>, ErrorType>;
                 using actual   = ReturnType_t<PipedType, FunctionReturnType>;

@@ -105,6 +105,21 @@ namespace result_type::detail{
             using ReturnType = ReturnType_t<OptArgType, decltype(callee(std::forward<OptArgType>(opt_arg).value()))>;
             return ReturnType(Optional<CalleeSuccesType>());
         }
+
+        template<typename OptArgType, typename Callee_>
+        static auto with(OptArgType&&opt_arg, Callee_&& callee)-> std::enable_if_t<
+                isResultTypeWithOptional<decltype(callee(std::forward<OptArgType>(opt_arg).value()))>::value
+                ,ReturnType_t<OptArgType, decltype(callee(std::forward<OptArgType>(opt_arg).value()))>>{
+            if(opt_arg){
+                using result_type::operator|;
+                return std::forward<OptArgType>(opt_arg).value()
+                        | std::forward<Callee_>(callee)
+                        ;
+            }
+            using CalleeReturnType = decltype(callee(std::forward<OptArgType>(opt_arg).value()));
+            using CalleeSuccesType = typename CalleeReturnType::ResultSuccessType;
+            return CalleeSuccesType();
+        }
     };
     template<typename ArgType, typename Callee>
     struct call<ArgType, Callee, std::enable_if_t<
@@ -116,7 +131,6 @@ namespace result_type::detail{
         template<typename ArgType_, typename Callee_>
         static auto with(ArgType_&&arg, Callee_&& callee)-> std::enable_if_t<std::is_void<decltype(callee(std::forward<ArgType_>(arg).Success()))>::value
         ,detail::ReturnType_t<ArgType_, decltype(callee(std::forward<ArgType_>(arg).Success())) >>{
-            //using ReturnType = detail::ReturnType_t<ArgType_, decltype(callee(std::forward<ArgType_>(arg).Success()))>;
             if (IsSuccess(arg)){
                 callee(std::forward<ArgType_>(arg).Success());
                 return NothingType();
@@ -129,7 +143,6 @@ namespace result_type::detail{
                 !std::is_void<decltype(callee(std::forward<ArgType_>(arg).Success()))>::value
                 && !is_result_type<decltype(callee(std::forward<ArgType_>(arg).Success()))>::value
                 ,detail::ReturnType_t<ArgType_, decltype(callee(std::forward<ArgType_>(arg).Success())) >>{
-            //using ReturnType = detail::ReturnType_t<ArgType_, decltype(callee(std::forward<ArgType_>(arg).Success()))>;
             if (IsSuccess(arg)){
                 return callee(std::forward<ArgType_>(arg).Success());
             }

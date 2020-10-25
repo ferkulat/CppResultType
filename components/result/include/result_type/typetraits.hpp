@@ -106,6 +106,13 @@ using detected_or = detail::detector<Default, void, Op, Args...>;
             is_result_type<T>::value
             && !is_optional_type<typename T::ResultSuccessType>::value
             , void>>:std::true_type {};
+    template <typename T, typename = void>
+    struct isResultTypeWithOptional:std::false_type {};
+    template <typename T>
+    struct isResultTypeWithOptional<T, std::enable_if_t<
+            is_result_type<T>::value
+            && is_optional_type<typename T::ResultSuccessType>::value
+            , void>>:std::true_type {};
 
 
 
