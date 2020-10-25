@@ -150,6 +150,16 @@ namespace result_type::detail{
             return std::forward<ResultArgType>(result_arg).Error();
         }
 
+        // piping a Result<T, E> to a function  f(T)->Result<U, E>, returns Result<U, E>
+        template<typename ResultArgType, typename Callee_>
+        static auto with(ResultArgType&&result_arg, Callee_&& callee)-> std::enable_if_t<
+                is_result_type<decltype(callee(std::forward<ResultArgType>(result_arg).Success()))>::value
+                ,detail::ReturnType_t<ResultArgType, decltype(callee(std::forward<ResultArgType>(result_arg).Success())) >>{
+            if (IsSuccess(result_arg)){
+                return callee(std::forward<ResultArgType>(result_arg).Success());
+            }
+            return std::forward<ResultArgType>(result_arg).Error();
+        }
     };
     }
 
