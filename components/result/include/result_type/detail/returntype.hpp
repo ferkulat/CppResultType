@@ -32,6 +32,17 @@ namespace result_type {
         };
 
         template<typename PipeInput, typename FunctionReturnType>
+        struct ReturnTypeImpl<PipeInput, FunctionReturnType, std::enable_if_t<
+                is_result_type<PipeInput>::value
+                && !std::is_void<FunctionReturnType>::value
+                && !is_optional_type<FunctionReturnType>::value
+                && !is_result_type<FunctionReturnType>::value
+                , void>>
+        {
+            using type = Result<FunctionReturnType, typename PipeInput::ResultErrorType>;
+        };
+
+        template<typename PipeInput, typename FunctionReturnType>
         using ReturnType_t = typename detail::ReturnTypeImpl<PipeInput, FunctionReturnType>::type;
     }
 

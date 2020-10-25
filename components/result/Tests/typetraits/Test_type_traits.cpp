@@ -44,4 +44,15 @@ SCENARIO("Testing ReturnType_t"){
             }
         }
     }
+    GIVEN("a Result<T>"){
+        using PipedType = Result<int, ErrorType>;
+        WHEN("piping into a function F(T)->U"){
+         using FunctionReturnType = double;
+            THEN("the return type is of type Result<NothingType, E>"){
+                using expected = Result<double, ErrorType>;
+                using actual   = ReturnType_t<PipedType, FunctionReturnType>;
+                REQUIRE(std::is_same<expected, actual>::value);
+            }
+        }
+    }
 }
