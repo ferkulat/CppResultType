@@ -20,14 +20,6 @@ namespace result_type::detail{
     struct call;
 
 
-    template<typename Callee, typename ArgType>
-    using accepts = decltype(std::declval<Callee>()(std::declval<std::remove_reference_t<ArgType>>()));
-
-    template<typename Callee, typename ArgType, typename = void>
-    struct isInvokeable : std::false_type{};
-
-    template<typename Callee, typename ArgType>
-    struct isInvokeable<Callee, ArgType, std::void_t<accepts<Callee, ArgType>>>:std::true_type {};
 
     template<typename Callee, typename ArgType, typename ReturnType, typename = void>
     struct returns: std::false_type {};
@@ -54,6 +46,7 @@ namespace result_type::detail{
     struct call<ArgType, Callee, std::enable_if_t<
             !isInvokeable<Callee, ArgType>::value
             && is_optional_type<ArgType>::value
+            && isInvokeable<Callee, typename ArgType::value_type>::value
             , void>>
     {
         // piping an Optional<T> to a function void f(T), returns Optional<result_type::NothingType>
@@ -126,6 +119,7 @@ namespace result_type::detail{
     struct call<ArgType, Callee, std::enable_if_t<
             !isInvokeable<Callee, ArgType>::value
             && isResultTypeWithNonOptional<ArgType>::value
+            && isInvokeable<Callee, typename ArgType::ResultSuccessType>::value
             , void>>
     {
         // piping a Result<T, E> to a function void f(T), returns Result<result_type::NothingType, E>
@@ -170,11 +164,37 @@ namespace result_type::detail{
 
         template<typename ResultOptArgType, typename Callee_>
         static auto with(ResultOptArgType&&result_opt_arg, Callee_&& callee)-> std::enable_if_t<
-                true
-                ,detail::ReturnType_t<ResultOptArgType, Callee_, decltype(callee(std::forward<ResultOptArgType>(result_opt_arg).Success().value())) >>{
+         !isInvokeable<Callee, typename ArgType::ResultSuccessType>::value
+        &&isInvokeable<Callee, typename ArgType::ResultSuccessType::value_type>::value
+        ,detail::ReturnType_t<ResultOptArgType, Callee_, decltype(callee(std::forward<ResultOptArgType>(result_opt_arg).Success().value())) >>{
             if (IsSuccess(result_opt_arg)){
                 using result_type::operator|;
                 return std::forward<ResultOptArgType>(result_opt_arg).Success() |std::forward<Callee_>(callee);
+            }
+            return std::forward<ResultOptArgType>(result_opt_arg).Error();
+        }
+
+        template<typename ResultOptArgType, typename Callee_>
+        static auto with(ResultOptArgType&&result_opt_arg, Callee_&& callee)-> std::enable_if_t<
+                isInvokeable<Callee, typename ArgType::ResultSuccessType>::value
+                && !std::is_void<decltype(callee(std::forward<ResultOptArgType>(result_opt_arg).Success()))>::value
+                ,detail::ReturnType_t<ResultOptArgType, Callee_, decltype(callee(std::forward<ResultOptArgType>(result_opt_arg).Success())) >>{
+            if (IsSuccess(result_opt_arg)){
+                using result_type::operator|;
+                return std::forward<ResultOptArgType>(result_opt_arg).Success() |std::forward<Callee_>(callee);
+            }
+            return std::forward<ResultOptArgType>(result_opt_arg).Error();
+        }
+
+        template<typename ResultOptArgType, typename Callee_>
+        static auto with(ResultOptArgType&&result_opt_arg, Callee_&& callee)-> std::enable_if_t<
+                isInvokeable<Callee, typename ArgType::ResultSuccessType>::value
+                && std::is_void<decltype(callee(std::forward<ResultOptArgType>(result_opt_arg).Success()))>::value
+                ,detail::ReturnType_t<ResultOptArgType, Callee_, decltype(callee(std::forward<ResultOptArgType>(result_opt_arg).Success())) >>{
+            if (IsSuccess(result_opt_arg)){
+                using result_type::operator|;
+                std::forward<ResultOptArgType>(result_opt_arg).Success() |std::forward<Callee_>(callee);
+                return NothingType();
             }
             return std::forward<ResultOptArgType>(result_opt_arg).Error();
         }

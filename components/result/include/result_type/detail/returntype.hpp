@@ -58,17 +58,21 @@ namespace result_type {
         {
             using type = FunctionReturnType;
         };
+
         template<typename PipeInput, typename Function, typename FunctionReturnType>
         struct ReturnTypeImpl<PipeInput, Function, FunctionReturnType, std::enable_if_t<
                 isResultTypeWithOptional<PipeInput>::value
+                && !isInvokeable<Function, typename PipeInput::ResultSuccessType>::value
                 && std::is_void<FunctionReturnType>::value
                 , void>>
         {
             using type = Result<Optional<NothingType>, typename PipeInput::ResultErrorType>;
         };
+
         template<typename PipeInput, typename Function, typename FunctionReturnType>
         struct ReturnTypeImpl<PipeInput, Function, FunctionReturnType, std::enable_if_t<
                 isResultTypeWithOptional<PipeInput>::value
+                && !isInvokeable<Function, typename PipeInput::ResultSuccessType>::value
                 && !std::is_void<FunctionReturnType>::value
                 , void>>
         {
@@ -76,7 +80,37 @@ namespace result_type {
         };
 
         template<typename PipeInput, typename Function, typename FunctionReturnType>
-        using ReturnType_t = typename detail::ReturnTypeImpl<PipeInput, Function, FunctionReturnType>::type;
+        struct ReturnTypeImpl<PipeInput, Function, FunctionReturnType, std::enable_if_t<
+                isResultTypeWithOptional<PipeInput>::value
+                && isInvokeable<Function, typename PipeInput::ResultSuccessType>::value
+                && !std::is_void<FunctionReturnType>::value
+                && !is_result_type<FunctionReturnType>::value
+                , void>>
+        {
+            using type = Result<FunctionReturnType, typename PipeInput::ResultErrorType>;
+        };
+
+        template<typename PipeInput, typename Function, typename FunctionReturnType>
+        struct ReturnTypeImpl<PipeInput, Function, FunctionReturnType, std::enable_if_t<
+                isResultTypeWithOptional<PipeInput>::value
+                && isInvokeable<Function, typename PipeInput::ResultSuccessType>::value
+                && isResultTypeWithNonOptional<FunctionReturnType>::value
+                , void>>
+        {
+            using type = FunctionReturnType;
+        };
+        template<typename PipeInput, typename Function, typename FunctionReturnType>
+        struct ReturnTypeImpl<PipeInput, Function, FunctionReturnType, std::enable_if_t<
+                isResultTypeWithOptional<PipeInput>::value
+                && isInvokeable<Function, typename PipeInput::ResultSuccessType>::value
+                && std::is_void<FunctionReturnType>::value
+                , void>>
+        {
+            using type = Result<NothingType, typename PipeInput::ResultErrorType>;
+        };
+
+        template<typename PipeInput, typename Function, typename FunctionReturnType>
+        using ReturnType_t = typename detail::ReturnTypeImpl<typename std::remove_reference<PipeInput>::type , typename std::remove_reference<Function>::type, typename std::remove_reference<FunctionReturnType>::type>::type;
     }
 
 

@@ -115,6 +115,14 @@ using detected_or = detail::detector<Default, void, Op, Args...>;
             , void>>:std::true_type {};
 
 
+    template<typename Callee, typename ArgType>
+    using accepts = decltype(std::declval<Callee>()(std::declval<std::remove_reference_t<ArgType>>()));
+
+    template<typename Callee, typename ArgType, typename = void>
+    struct isInvokeable : std::false_type{};
+
+    template<typename Callee, typename ArgType>
+    struct isInvokeable<Callee, ArgType, std::void_t<accepts<Callee, ArgType>>>:std::true_type {};
 
 }
 #endif //CSV2XLS_TYPETRAITS_H
