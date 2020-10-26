@@ -53,7 +53,7 @@ TEST_CASE("Make the move constructor noexcept, depending on its success and erro
         return result;
     };
     auto actual = mayreturnsomething(); //just compile without error
-    CHECK(result_type::IsSuccess(actual));
+    CHECK(result_type::isSuccess(actual));
 
 }
 

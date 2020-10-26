@@ -15,8 +15,8 @@ constexpr auto MatchType(V&& variant, Os... overloads)
 
 using result_type::operator|;
 using result_type::Result;
-using result_type::IsSuccess;
-using result_type::IsError;
+using result_type::isSuccess;
+using result_type::isError;
 
 enum class Domain1 {Err1, Err2};
 enum class Domain2 {Err1, Err2};
@@ -45,5 +45,5 @@ auto FnTakingValue(Value value){
 TEST_CASE("(int | F(int)->Type1")
 {
 auto actual = Type1{2} |FnReturningT2|FnTakingValue;
-REQUIRE( IsError(actual) );
+REQUIRE(isError(actual) );
 }

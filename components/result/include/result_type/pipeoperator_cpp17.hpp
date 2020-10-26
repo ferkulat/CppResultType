@@ -51,7 +51,7 @@ namespace detail{
                     using ReturnType = Result<Optional<CalleeReturnSuccessType>, CalleeReturnErrorType>;
                     if (opt.has_value()) {
                         auto result = std::forward<Callee>(callee)(std::forward<OPT>(opt).value());
-                        return (IsSuccess(result))
+                        return (isSuccess(result))
                                ? ReturnType{Optional<CalleeReturnSuccessType>(std::move(result).Success())}
                                : ReturnType{std::move(result).Error()};
                     }
@@ -84,12 +84,12 @@ namespace detail{
         else if constexpr (std::is_invocable_v<Callee, ArgSuccessType>) {
             using callee_return_type = decltype(callee(std::declval<ArgSuccessType>()));
             if constexpr (is_result_type<callee_return_type>::value) {
-                return IsSuccess(arg) ? callee(std::forward<ArgType>(arg).Success())
+                return isSuccess(arg) ? callee(std::forward<ArgType>(arg).Success())
                                       : callee_return_type(std::forward<ArgType>(arg).Error());
             }
             else if constexpr (std::is_void_v<callee_return_type>) {
                 using ReturnType = Result<NothingType, ErrorReturnType>;
-                if (IsSuccess(arg)) {
+                if (isSuccess(arg)) {
                     callee(std::forward<ArgType>(arg).Success());
                     return ReturnType(NothingType{});
                 }
@@ -97,7 +97,7 @@ namespace detail{
             }
             else {
                 using ReturnType = Result<callee_return_type, ErrorReturnType>;
-                return IsSuccess(arg)
+                return isSuccess(arg)
                        ? ReturnType(callee(std::forward<ArgType>(arg).Success()))
                        : ReturnType(std::forward<ArgType>(arg).Error());
             }
@@ -108,7 +108,7 @@ namespace detail{
 //                using flattened_callee_return_type = decltype(callWithOptional( std::declval<ArgSuccessType>(),
 //                                                                                std::forward<Callee>(callee)));
 //                using ReturnType = flattened_callee_return_type;
-//                if (IsSuccess(arg) ) {
+//                if (isSuccess(arg) ) {
 //                    return callWithOptional(std::forward<ArgType>(arg).Success(),
 //                                                       std::forward<Callee>(callee));
 //                }
@@ -123,7 +123,7 @@ namespace detail{
                     if constexpr (is_optional_type<CalleeReturnSuccessType>::value){
                         using ReturnType = Result<CalleeReturnSuccessType, ErrorReturnType>;
 
-                        if (IsSuccess(arg)) {
+                        if (isSuccess(arg)) {
                             return (arg.CRefSuccess().has_value())
                                    ? callee(std::forward<ArgType>(arg).Success().value())
                                    : ReturnType{CalleeReturnSuccessType{}};
@@ -134,10 +134,10 @@ namespace detail{
                     }
                     else {
                         using ReturnType = Result<Optional<CalleeReturnSuccessType>, ErrorReturnType>;
-                        if (IsSuccess(arg)) {
+                        if (isSuccess(arg)) {
                             if (arg.CRefSuccess().has_value()) {
                                 auto result = callee(std::forward<ArgType>(arg).Success().value());
-                                return (IsSuccess(result))
+                                return (isSuccess(result))
                                        ? ReturnType{Optional<CalleeReturnSuccessType>(std::move(result).Success())}
                                        : ReturnType{std::move(result).Error()};
                             }
@@ -152,7 +152,7 @@ namespace detail{
                     using flattened_callee_return_type = decltype(callWithOptional( std::declval<ArgSuccessType>(),
                                                                                     std::forward<Callee>(callee)));
                     using ReturnType = Result<flattened_callee_return_type, ErrorReturnType>;
-                    if (IsSuccess(arg)) {
+                    if (isSuccess(arg)) {
                         return ReturnType{callWithOptional(std::forward<ArgType>(arg).Success(),
                                                            std::forward<Callee>(callee))};
                     }

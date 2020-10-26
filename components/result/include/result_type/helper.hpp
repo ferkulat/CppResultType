@@ -90,7 +90,7 @@ namespace result_type::helper::detail{
         constexpr static
         std::enable_if_t<is_result_type<std::tuple_element_t<0, Tuple>>::value, Optional<ErrorType>>
         getImpl(Tuple &&tuple, tuple_element_index<0>) {
-            return (result_type::IsError(std::get<0>(tuple)))
+            return (result_type::isError(std::get<0>(tuple)))
                    ? std::get<0>(std::forward<Tuple>(tuple)).Error()
                    : Optional<ErrorType>();
         }
@@ -101,7 +101,7 @@ namespace result_type::helper::detail{
         getImpl(Tuple &&tuple,
                 tuple_element_index<N>) {
 
-            return (result_type::IsError(std::get<N>(tuple)))
+            return (result_type::isError(std::get<N>(tuple)))
                    ? std::get<N>(std::forward<Tuple>(tuple)).Error()
                    : getImpl(std::forward<Tuple>(tuple), tuple_element_index<N - 1>());
         }
@@ -157,7 +157,7 @@ constexpr auto success_tuple_or_err(Tuple &&tuple) {
         using ReturnType = result_type::Result<ReturnSuccessType, ReturnErrorType>;
 
         auto is_err = [](auto const &...item) {
-            return (IsError(item)||...);
+            return (isError(item)||...);
         };
 
 
@@ -177,7 +177,7 @@ struct intoExitCode{
     template<typename T>
     auto operator()(T const& item)->int{
         if constexpr (is_result_type<T>::value) {
-            if (IsError(item)) {
+            if (isError(item)) {
                 return -1;
             }
             return 0;
@@ -195,7 +195,7 @@ namespace helper_detail{
     template<typename OStreamType, typename T>
     void streamSuccessHelper(OStreamType& os, T const& t){
         if constexpr (is_result_type<T>::value){
-            if(IsSuccess(t)){
+            if(isSuccess(t)){
                 streamSuccessHelper(os, t.CRefSuccess());
             }
         }
@@ -212,7 +212,7 @@ namespace helper_detail{
     template<typename OStreamType, typename T>
     void streamErrorHelper(OStreamType& os, T const& t){
         if constexpr (is_result_type<T>::value){
-            if(IsError(t)){
+            if(isError(t)){
                 os << t.CRefError();
             }
         }

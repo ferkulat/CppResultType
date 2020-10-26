@@ -9,8 +9,8 @@
 #include <result_type/detail/value_type_of.hpp>
 
 using result_type::Result;
-using result_type::IsSuccess;
-using result_type::IsError;
+using result_type::isSuccess;
+using result_type::isError;
 
 template<typename T, typename = void>
 struct has_field_type : public std::false_type{};

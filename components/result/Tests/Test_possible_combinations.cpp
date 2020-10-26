@@ -7,8 +7,8 @@
 
 using result_type::operator|;
 using result_type::Result;
-using result_type::IsSuccess;
-using result_type::IsError;
+using result_type::isSuccess;
+using result_type::isError;
 using result_type::NullOpt;
 
 enum class Error{Fail1, NotOdd};

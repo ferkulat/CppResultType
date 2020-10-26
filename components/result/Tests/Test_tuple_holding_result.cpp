@@ -69,5 +69,5 @@ TEST_CASE("Given a tuple with Result types and other types, when one of its Resu
     CHECK(std::is_same_v<InputType, decltype(input())>);
     CHECK(std::is_same_v<ActualType, ExpectedType>);
 
-    CHECK(result_type::IsError(actual));
+    CHECK(result_type::isError(actual));
 }
