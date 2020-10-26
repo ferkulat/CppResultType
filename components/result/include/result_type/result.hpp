@@ -59,14 +59,8 @@ namespace result_type {
         constexpr Result(ErrorType const&value) : result_type_value(value) {
         }
 
-        template<typename U = ValueType>
-        constexpr auto State() const -> std::enable_if_t<!is_boost_variant<U>::value, ResultState>{
-            return (result_type_value.index() == 0)
-                   ? ResultState::Success : ResultState::Error;
-        }
-        template<typename U = ValueType>
-        constexpr auto State() const -> std::enable_if_t<is_boost_variant<U>::value, ResultState>{
-            return (result_type_value.which() == 0)
+        constexpr auto State() const{
+            return ( getVariantIndex() == 0)
                    ? ResultState::Success : ResultState::Error;
         }
 
@@ -109,6 +103,18 @@ namespace result_type {
         constexpr bool operator==(Result const &other) const {
             return other.result_type_value == result_type_value;
         }
+    private:
+        template<typename U = ValueType>
+        std::enable_if_t<is_boost_variant<U>::value, int>
+        getVariantIndex() const {
+           return result_type_value.which();
+        }
+        template<typename U = ValueType>
+        std::enable_if_t<!is_boost_variant<U>::value, size_t>
+        getVariantIndex() const {
+            return result_type_value.index();
+        }
+
     };
 
     template<typename T>
