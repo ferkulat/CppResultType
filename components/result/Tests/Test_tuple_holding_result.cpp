@@ -5,7 +5,9 @@
 #include <type_traits>
 #include <doctest/doctest.h>
 #include "result_type/pipeoperator.hpp"
-#include <result_type/helper.hpp>
+#include <result_type/helper/success_tuple_or_err.hpp>
+#include <result_type/helper/detail/success_type.hpp>
+
 #include <tuple>
 #include <string>
 
@@ -17,21 +19,21 @@ TEST_CASE("Given a tuple with at no member of type Result<S,E>, when passing thi
 {
     using MyType = std::tuple<float,int>;
 
-    CHECK_FALSE(result_type::helper::detail::is_tuple_with_result<MyType>::value);
+    CHECK_FALSE(result_type::is_tuple_with_result<MyType>::value);
 }
 
 TEST_CASE("Given a tuple with at least one member of type Result<S,E>, when passing this type to ContainsResult, then ::value is true")
 {
     using MyType = std::tuple<int, result_type::Result<float, Error >, float>;
 
-    CHECK(result_type::helper::detail::is_tuple_with_result<MyType>::value);
+    CHECK(result_type::is_tuple_with_result<MyType>::value);
 }
 
 TEST_CASE("Given a type that is not a tuple, when passing this type to ContainsResult, then ::value is false")
 {
     using MyType = std::tuple<float>;
 
-    CHECK_FALSE(result_type::helper::detail::is_tuple_with_result<MyType>::value);
+    CHECK_FALSE(result_type::is_tuple_with_result<MyType>::value);
 }
 
 TEST_CASE("Given a type which is not Result<S,E>, when passing this type to success_type, then ::type is type")

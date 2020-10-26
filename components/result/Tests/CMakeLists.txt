@@ -11,7 +11,7 @@ set(SOURCE_FILES
 
         properties_tests.cpp
         Test_helper_success_error.cpp
-        )
+        Test_into_exitcode.cpp Test_stream.cpp)
 if (NOT CPPRESULTTYPE_WITH_BOOST_VARIANT)
 list(APPEND SOURCE_FILES
         Test_tuple_holding_result.cpp

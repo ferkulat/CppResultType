@@ -124,5 +124,15 @@ using detected_or = detail::detector<Default, void, Op, Args...>;
     template<typename Callee, typename ArgType>
     struct isInvokeable<Callee, ArgType, std::void_t<accepts<Callee, ArgType>>>:std::true_type {};
 
+    template<typename...Ts>
+    struct is_tuple_with_result : std::false_type {
+    };
+
+    template<typename...Ts>
+    struct is_tuple_with_result<std::tuple<Ts...>> {
+        constexpr static auto value = (result_type::is_result_type<Ts>::value || ...);
+    };
+
+
 }
 #endif //CSV2XLS_TYPETRAITS_H
