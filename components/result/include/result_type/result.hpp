@@ -111,14 +111,18 @@ namespace result_type {
         }
     };
 
-    template<typename SuccessType, typename ErrorType>
-    constexpr bool IsSuccess(Result<SuccessType, ErrorType> const &result) {
+    template<typename T>
+    constexpr auto IsSuccess(T const &result)->std::enable_if_t< is_result_type<T>::value ,bool> {
         return result.State() == ResultState::Success;
     }
+    template<typename T>
+    constexpr auto IsSuccess(T const &)->std::enable_if_t< !is_result_type<T>::value ,bool> {
+        return true;
+    }
 
-    template<typename SuccessType, typename ErrorType>
-    constexpr bool IsError(Result<SuccessType, ErrorType> const &result) {
-        return result.State() == ResultState::Error;
+    template<typename T>
+    constexpr bool IsError(T const &result) {
+        return ! IsSuccess(result);
     }
 }
 #endif //RESULT_TYPE_H

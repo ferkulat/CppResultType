@@ -10,6 +10,7 @@ set(SOURCE_FILES
         Test_possible_combinations.cpp
 
         properties_tests.cpp
+        Test_helper_success_error.cpp
         )
 if (NOT CPPRESULTTYPE_WITH_BOOST_VARIANT)
 list(APPEND SOURCE_FILES

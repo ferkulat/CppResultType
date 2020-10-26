@@ -29,14 +29,6 @@ namespace result_type::helper::detail{
         using type = S;
     };
 
-    template<typename T>
-    bool isError([[maybe_unused]] T const &t) {
-        if constexpr (result_type::is_result_type<T>::value) {
-            return result_type::IsError(t);
-        } else {
-            return false;
-        }
-    }
 
     template<typename T>
     auto successOf(T &&t) {
@@ -105,7 +97,7 @@ namespace result_type::helper::detail{
 
         template<size_t N, typename Tuple>
         constexpr static
-        std::enable_if_t<is_result_type<std::tuple_element_t<N, Tuple>>::value, std::optional<ErrorType>>
+        std::enable_if_t<is_result_type<std::tuple_element_t<N, Tuple>>::value, Optional<ErrorType>>
         getImpl(Tuple &&tuple,
                 tuple_element_index<N>) {
 
@@ -116,22 +108,22 @@ namespace result_type::helper::detail{
 
         template<typename Tuple>
         constexpr static
-        std::enable_if_t<!is_result_type<std::tuple_element_t<0, Tuple>>::value, std::optional<ErrorType>>
+        std::enable_if_t<!is_result_type<std::tuple_element_t<0, Tuple>>::value, Optional<ErrorType>>
         getImpl(Tuple &&, tuple_element_index<0>) {
-            return std::optional<ErrorType>();
+            return Optional<ErrorType>();
         }
 
         template<size_t N, typename Tuple>
         constexpr static
-        std::enable_if_t<!is_result_type<std::tuple_element_t<N, Tuple>>::value, std::optional<ErrorType>>
+        std::enable_if_t<!is_result_type<std::tuple_element_t<N, Tuple>>::value, Optional<ErrorType>>
         getImpl(Tuple &&tuple, tuple_element_index<N>) {
             return getImpl(std::forward<Tuple>(tuple), tuple_element_index<N - 1>());
         }
 
     public:
         template<typename Tuple>
-        constexpr static auto get(Tuple &&tuple) -> std::optional<ErrorType> {
-            return getImpl(std::forward<Tuple>(tuple), tuple_element_index<std::tuple_size_v<Tuple> - 1>());
+        constexpr static auto get(Tuple &&tuple) -> Optional<ErrorType> {
+            return getImpl(std::forward<Tuple>(tuple), tuple_element_index<std::tuple_size<Tuple>::value - 1>());
         }
     };
 
@@ -149,10 +141,10 @@ namespace result_type::helper{
 
 template<typename Tuple>
 constexpr auto success_tuple_or_err(Tuple &&tuple) {
-    static_assert(std::is_rvalue_reference_v<decltype(std::forward<Tuple>(tuple))>);
+    static_assert(std::is_rvalue_reference<decltype(std::forward<Tuple>(tuple))>::value);
     if constexpr (detail::is_tuple_with_result<Tuple>::value) {
         using AllResultTypes = typename detail::tupleOfResultTypesIn<Tuple>::type;
-        if constexpr (std::tuple_size_v<AllResultTypes> > 1) {
+        if constexpr (std::tuple_size<AllResultTypes>::value > 1) {
             static_assert(detail::have_same_error_type<AllResultTypes>::value);
         }
 
@@ -165,15 +157,15 @@ constexpr auto success_tuple_or_err(Tuple &&tuple) {
         using ReturnType = result_type::Result<ReturnSuccessType, ReturnErrorType>;
 
         auto is_err = [](auto const &...item) {
-            return (detail::isError(item)||...);
+            return (IsError(item)||...);
         };
 
 
 
-        if (std::apply(is_err, std::forward<Tuple>(tuple))) {
+        if (apply(is_err, std::forward<Tuple>(tuple))) {
             return ReturnType{detail::FirstError<ReturnErrorType>::get(std::forward<Tuple>(tuple)).value()};
         }
-        return ReturnType{std::apply(tupleOfSuccess, std::forward<Tuple>(tuple))};
+        return ReturnType{apply(tupleOfSuccess, std::forward<Tuple>(tuple))};
     } else {
         return tuple;
     }
@@ -190,7 +182,7 @@ struct intoExitCode{
             }
             return 0;
         }
-        else if(std::is_same_v<T, int>){
+        else if(std::is_same<T, int>::value){
             return item;
         }
         else{
