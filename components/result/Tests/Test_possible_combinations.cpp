@@ -2,7 +2,7 @@
 // Created by marcel on 3/30/17.
 //
 #include <type_traits>
-#include <catch2/catch.hpp>
+#include <doctest/doctest.h>
 #include "result_type/pipeoperator.hpp"
 
 using result_type::operator|;
@@ -177,18 +177,18 @@ TEST_CASE("Piping when function is callable with piped value returns the same ty
 
 }
 TEST_CASE("Piping std::optional<T> into a function which expects T") {
-    SECTION(" and returns 'void', when optional<T> is empty, then it does not call the function and returns an empty std::optional<ResultType::NothingType>") {
+    SUBCASE(" and returns 'void', when optional<T> is empty, then it does not call the function and returns an empty std::optional<ResultType::NothingType>") {
         bool called = false;
         REQUIRE(IsTrue(piping(Opt<int>{}), toFunction([&called](int) -> void {called=true;}), returns<Opt<NothingType> >{}));
         REQUIRE_FALSE(called);
     }
-    SECTION(" and returns 'void', when optional<T> is initialized, then it does call the function and returns an initialized std::optional<ResultType::NothingType>") {
+    SUBCASE(" and returns 'void', when optional<T> is initialized, then it does call the function and returns an initialized std::optional<ResultType::NothingType>") {
         bool called = false;
         REQUIRE(IsTrue(piping(Opt<int>{1}), toFunction([&called](int) -> void {called=true;}), returns<Opt<NothingType> >{NothingType{}}));
         REQUIRE(called);
     }
 
-    SECTION(", wraps the function return type into std::optional") {
+    SUBCASE(", wraps the function return type into std::optional") {
         REQUIRE(IsTrue(piping(Opt<int>{2}), toFunction([](int val) -> float       { return float(val) + 1.0f         ;} ), returns<Opt<float>     >{           3.0f } ));
         REQUIRE(IsTrue( piping(Opt<int>{2}), toFunction([](int val)->Opt<float>   {return float(val)+1.0f            ;} ), returns< Opt<float>    >{           3.0f } ));
         REQUIRE(IsTrue( piping(Opt<int>{2}), toFunction([](int    )->Opt<float>   {return Opt<float>()               ;} ), returns< Opt<float>    >{                } ));
@@ -365,7 +365,7 @@ SCENARIO("Piping Result<std::optional<T>, E> into a function which expects std::
 
 TEST_CASE("Piping Result<std::optional<T>, E> into a function which expects Result<T, E>,  wraps the function return type into Result")
 {
-    SECTION("This is not implemented yet")
+    SUBCASE("This is not implemented yet")
     {
 //    REQUIRE(IsTrue(piping(ResOpt<int>{1})            , toFunction([](Res<int>    )->void {}                                             ), returns<  Opt<NothingType> >{NothingType{}}    ));
 //    REQUIRE(IsTrue(piping(ResOpt<int>{2})            , toFunction([](Res<int> val)->float{return val.CRefSuccess()+1.0f;}               ), returns<  Opt<float>       >{3.0f}             ));

@@ -1,7 +1,7 @@
 //
 // Created by marcel on 7/21/19.
 //
-#include <catch2/catch.hpp>
+#include <doctest/doctest.h>
 #include "result_type/pipeoperator.hpp"
 template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
 template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;

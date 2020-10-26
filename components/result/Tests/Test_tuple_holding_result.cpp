@@ -3,10 +3,11 @@
 //
 
 #include <type_traits>
-#include <catch2/catch.hpp>
+#include <doctest/doctest.h>
 #include "result_type/pipeoperator.hpp"
 #include <result_type/helper.hpp>
 #include <tuple>
+#include <string>
 
 enum class Error {
     Fail1, NotOdd

@@ -4,7 +4,7 @@
 
 #include <type_traits>
 #include <sstream>
-#include <catch2/catch.hpp>
+#include <doctest/doctest.h>
 #include "result_type/helper.hpp"
 #include <result_type/detail/value_type_of.hpp>
 
