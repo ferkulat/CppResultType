@@ -6,18 +6,26 @@ include(doctest)
 
 include(warnings)
 set(SOURCE_FILES
-        TestMain.cpp
-        Test_possible_combinations.cpp
-
-        Test_hepler.cpp
-        properties_tests.cpp
         Test_helper_success_error.cpp
-        Test_into_exitcode.cpp Test_stream.cpp)
-if (NOT CPPRESULTTYPE_WITH_BOOST_VARIANT)
+        Test_hepler.cpp
+        Test_into_exitcode.cpp
+        Test_main.cpp
+        Test_possible_combinations.cpp
+        Test_properties.cpp
+        Test_stream.cpp
+        )
+
+if (CPPRESULTTYPE_CAN_USE_OVERLOAD_PATTERN)
 list(APPEND SOURCE_FILES
-        Test_tuple_holding_result.cpp
         Test_with_variants.cpp
         )
+endif ()
+
+if (CPPRESULTTYPE_CAN_USE_STD_APPLY)
+    list(APPEND SOURCE_FILES
+            Test_tuple_holding_result.cpp
+            )
+
 endif ()
 add_executable(resulttypetests ${SOURCE_FILES})
 

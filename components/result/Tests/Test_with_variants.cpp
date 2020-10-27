@@ -9,7 +9,7 @@ template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 template <typename V, typename... Os>
 constexpr auto MatchType(V&& variant, Os... overloads)
 {
-    return std::visit(overloaded{overloads...}, std::forward<V>(variant));
+    return CPPRESULTTYPE_VARIANT_VISIT(overloaded{overloads...}, std::forward<V>(variant));
 }
 
 
@@ -25,9 +25,9 @@ struct Type3{constexpr explicit Type3(int val_):val(val_){} int val;};
 struct Type4{constexpr explicit Type4(int val_):val(val_){} int val;};
 struct Type1{constexpr explicit Type1(int val_):val(val_){} int val;};
 
-using Error = std::variant<Domain1, Domain2>;
+using Error = result_type::Variant<Domain1, Domain2>;
 
-using Value = std::variant<Type1, Type2, Type3>;
+using Value = result_type::Variant<Type1, Type2, Type3>;
 
 auto FnReturningT2(Type1 t1)->Result<Value , Error >{
     if (t1.val) return Value{Type2{2}};

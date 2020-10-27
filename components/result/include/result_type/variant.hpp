@@ -12,6 +12,7 @@ namespace result_type{
   using Variant = boost::variant<T...>;
 
 #define CPPRESULTTYPE_VARIANT_GET boost::strict_get
+#define CPPRESULTTYPE_VARIANT_VISIT boost::apply_visitor
 }
 #else
 #include <variant>
@@ -19,6 +20,7 @@ namespace result_type{
   template<typename...T>
   using Variant = std::variant<T...>;
 #define CPPRESULTTYPE_VARIANT_GET std::get
+#define CPPRESULTTYPE_VARIANT_VISIT std::visit
 }
 #endif
 

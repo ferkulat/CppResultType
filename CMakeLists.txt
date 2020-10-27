@@ -2,16 +2,8 @@ cmake_minimum_required(VERSION 3.11)
 set (project cppresulttype)
 project(${project})
 
-message("CMAKE_CXX_COMPILER_ID ${CMAKE_CXX_COMPILER_ID}")
-message("CMAKE_CXX_PLATFORM_ID ${CMAKE_CXX_PLATFORM_ID}")
-message("CMAKE_CXX_COMPILER_VERSION ${CMAKE_CXX_COMPILER_VERSION}")
-
-
-option(CPPRESULTTYPE_WITH_BOOST_VARIANT OFF)
-option(CPPRESULTTYPE_WITH_BOOST_OPTIONAL OFF)
-option(CPPRESULTTYPE_WITH_CPP14_PIPE OFF)
-
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
+include(setoptions)
 include(gitversion)
 include(version)
 set(CMAKE_VERBOSE_MAKEFILE ON)
