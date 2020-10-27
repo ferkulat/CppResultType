@@ -4,6 +4,11 @@
 #include <result_type/result.hpp>
 #include <result_type/pipeoperator.hpp>
 
+#ifdef CPPRESULTTYPE_WITH_BOOST_OPTIONAL
+// if not included, Doctest fails to compile
+#include <boost/optional/optional_io.hpp>
+#endif
+
 #include <sstream>
 using result_type::operator|;
 enum class Error{lol};
@@ -34,10 +39,12 @@ TEST_CASE("Passing Result<Success, Error>(Success())"){
 }
 
 TEST_CASE("Passing Result<Optional<Success>, Error>(Optional<Success>(Success))"){
+    using SuccessType = result_type::Optional<std::string>;
+    using ValueType =  result_type::Result<SuccessType, Error>;
     SUBCASE(" to streamSuccessTo(an_output_stream), streams the success value and returns the input value"){
         auto output_stream  = std::stringstream{};
-        auto const actual   = result_type::Result<result_type::Optional<std::string>,Error>("hi there :)") | result_type::helper::streamSuccessTo(output_stream);
-        auto const expected = result_type::Result<result_type::Optional<std::string>,Error>("hi there :)");
+        auto const actual   = ValueType{SuccessType{std::string{"hi there :)"}}} | result_type::helper::streamSuccessTo(output_stream);
+        auto const expected = ValueType{SuccessType{std::string{"hi there :)"}}};
 
         REQUIRE(std::is_same<decltype(actual), decltype(expected)>::value);
         REQUIRE(actual == expected);
@@ -45,8 +52,8 @@ TEST_CASE("Passing Result<Optional<Success>, Error>(Optional<Success>(Success))"
     }
     SUBCASE(" to streamErrorTo(an_output_stream), but does not stream anything"){
         auto output_stream  = std::stringstream{};
-        auto const actual   = result_type::Result<result_type::Optional<std::string>,Error>("hi there :)") | result_type::helper::streamErrorTo(output_stream);
-        auto const expected = result_type::Result<result_type::Optional<std::string>,Error>("hi there :)");
+        auto const actual   = ValueType{SuccessType{std::string{"hi there :)"}}} | result_type::helper::streamErrorTo(output_stream);
+        auto const expected = ValueType{SuccessType{std::string{"hi there :)"}}};
 
         REQUIRE(std::is_same<decltype(actual), decltype(expected)>::value);
         REQUIRE(actual == expected);
@@ -87,8 +94,9 @@ TEST_CASE("Passing Optional<T>(Optional<T>(T()))"){
     }
     SUBCASE(" to streamErrorTo(an_output_stream), but does not stream anything"){
         auto output_stream  = std::stringstream{};
-        auto const actual   = result_type::Optional<std::string>("hi there :)") | result_type::helper::streamErrorTo(output_stream);
-        auto const expected = result_type::Optional<std::string>("hi there :)");
+        constexpr static auto text = "hi there :)";
+        auto const actual   = result_type::Optional<std::string>(text) | result_type::helper::streamErrorTo(output_stream);
+        auto const expected = result_type::Optional<std::string>(text);
 
         REQUIRE(std::is_same<decltype(actual), decltype(expected)>::value);
         REQUIRE(actual == expected);

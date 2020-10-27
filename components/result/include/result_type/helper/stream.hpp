@@ -24,7 +24,7 @@ namespace result_type::helper {
         struct streamSuccessToImpl<T,std::enable_if_t<is_optional_type<T>::value, void>>{
             template<typename OstreamType>
             static void stream(OstreamType& ostreamType, T const& t){
-                if(t.has_value()) {
+                if(t) {
                     streamSuccessHelper(ostreamType, t.value());
                 }
             }

@@ -7,17 +7,33 @@
 #include <tuple>
 #include <result_type/typetraits.hpp>
 #include <result_type/result.hpp>
+#include <result_type/helper/detail/apply.hpp>
 namespace result_type::helper::detail{
 
+    template <typename T, typename = void>
+    struct successOfImpl{
+        template<typename U>
+        constexpr static auto get(U&&u){
+            return std::forward<U>(u);
+        }
+    };
 
+    template <typename T>
+    struct successOfImpl<T, std::enable_if_t<result_type::is_result_type<T>::value, void>>{
+        template<typename U>
+        constexpr static auto get(U&&u){
+            return std::forward<U>(u).Success();
+        }
+    };
 
     template<typename T>
     auto successOf(T &&t) {
-        if constexpr (result_type::is_result_type<T>::value) {
-            return std::forward<T>(t).Success();
-        } else {
-            return std::move(t);
-        }
+        return successOfImpl<T>::get(std::forward<T>(t));
+//        if constexpr (result_type::is_result_type<T>::value) {
+//            return std::forward<T>(t).Success();
+//        } else {
+//            return std::move(t);
+//        }
     }
 
     template<typename T, typename...Ts>
@@ -116,11 +132,11 @@ namespace result_type::helper::detail{
             is_tuple_with_result<Tuple>::value, void>>{
         template<typename T>
         constexpr static auto get(T&&tuple){
-            using AllResultTypes = typename detail::tupleOfResultTypesIn<Tuple>::type;
-            static_assert(detail::have_same_error_type<AllResultTypes>::value);
+            using AllResultTypes = typename tupleOfResultTypesIn<Tuple>::type;
+            static_assert(have_same_error_type<AllResultTypes>::value);
 
             auto tupleOfSuccess = [](auto &&...args) {
-                return std::make_tuple(detail::successOf(std::forward<decltype(args)>(args))...);
+                return std::make_tuple(successOf(std::forward<decltype(args)>(args))...);
             };
             using ReturnSuccessType = decltype(std::apply(tupleOfSuccess, std::forward<Tuple>(tuple)));
             using ReturnErrorType   = typename std::tuple_element_t<0, AllResultTypes>::ResultErrorType;
@@ -133,10 +149,10 @@ namespace result_type::helper::detail{
 
 
 
-            if (apply(is_err, std::forward<Tuple>(tuple))) {
-                return ReturnType{detail::FirstError<ReturnErrorType>::get(std::forward<Tuple>(tuple)).value()};
+            if (std::apply(is_err, std::forward<Tuple>(tuple))) {
+                return ReturnType{FirstError<ReturnErrorType>::get(std::forward<Tuple>(tuple)).value()};
             }
-            return ReturnType{apply(tupleOfSuccess, std::forward<Tuple>(tuple))};
+            return ReturnType{std::apply(tupleOfSuccess, std::forward<Tuple>(tuple))};
         }
     };
     template<typename Tuple>

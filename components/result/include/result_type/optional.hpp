@@ -6,7 +6,7 @@
 #define CPPRESULTTYPE_OPTIONAL_HPP
 
 
-#ifdef CPPRESULTTYPE_WITH_CPP14_PIPE
+#ifdef CPPRESULTTYPE_WITH_BOOST_OPTIONAL
 
 #include <boost/optional.hpp>
 #include <boost/none.hpp>

@@ -8,11 +8,6 @@
 #ifdef CPPRESULTTYPE_WITH_CPP14_PIPE
 #include <result_type/pipeoperator_cpp14.hpp>
 #else
-namespace result_type {
-    template<typename T>
-    using Optional = std::optional<T>;
-
-}
 #include <result_type/pipeoperator_cpp17.hpp>
 #endif
 #endif //CPPRESULTTYPE_PIPEOPERATOR_H

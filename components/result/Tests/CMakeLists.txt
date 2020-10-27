@@ -9,13 +9,13 @@ set(SOURCE_FILES
         TestMain.cpp
         Test_possible_combinations.cpp
 
+        Test_hepler.cpp
         properties_tests.cpp
         Test_helper_success_error.cpp
         Test_into_exitcode.cpp Test_stream.cpp)
 if (NOT CPPRESULTTYPE_WITH_BOOST_VARIANT)
 list(APPEND SOURCE_FILES
         Test_tuple_holding_result.cpp
-        Test_hepler.cpp
         Test_with_variants.cpp
         )
 endif ()

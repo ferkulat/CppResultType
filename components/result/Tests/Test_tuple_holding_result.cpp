@@ -38,12 +38,12 @@ TEST_CASE("Given a type that is not a tuple, when passing this type to ContainsR
 
 TEST_CASE("Given a type which is not Result<S,E>, when passing this type to success_type, then ::type is type")
 {
-    CHECK(std::is_same_v<result_type::helper::detail::success_type<float>::type, float>);
+    CHECK(std::is_same<result_type::helper::detail::success_type<float>::type, float>::value);
 }
 
 TEST_CASE("Given a type which is Result<S,E>, when passing this type to success_type, then ::type is S")
 {
-    CHECK(std::is_same_v<result_type::helper::detail::success_type<result_type::Result<float, Error >>::type, float>);
+    CHECK(std::is_same<result_type::helper::detail::success_type<result_type::Result<float, Error >>::type, float>::value);
 }
 
 TEST_CASE("Given a tuple<Result<S1,E>, Result<S2,E>>, when its members hold success, then it gets converted to  Result<std::tuple<S1, S2>,E>")
@@ -68,8 +68,8 @@ TEST_CASE("Given a tuple with Result types and other types, when one of its Resu
     using InputType    = std::tuple<float, int, result_type::Result<float, Error >, std::string, result_type::Result<std::string, Error >>;
     using ExpectedType = result_type::Result<std::tuple<float,int,float,std::string, std::string>, Error>;
 
-    CHECK(std::is_same_v<InputType, decltype(input())>);
-    CHECK(std::is_same_v<ActualType, ExpectedType>);
+    CHECK(std::is_same<InputType, decltype(input())>::value);
+    CHECK(std::is_same<ActualType, ExpectedType>::value);
 
     CHECK(result_type::isError(actual));
 }
