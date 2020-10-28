@@ -157,3 +157,56 @@ SCENARIO("Testing ReturnType_t"){
         }
     }
 }
+
+
+TEST_SUITE("Testing is_result<T>"){
+    TEST_CASE("T = Result<U,E>&, should return true"){
+        auto const actual = result_type::is_result_type<result_type::Result<double, ErrorType>&>::value;
+        REQUIRE(actual);
+    }
+}
+
+TEST_SUITE("Testing isInvokable"){
+    TEST_CASE("lol"){
+        auto const callable = [](std::string& str){return str.size();};
+        using ArgType = result_type::Result<std::string, ErrorType>&;
+
+        auto const actual = result_type::isInvokeable<decltype(callable),decltype(std::declval<ArgType>().Success())>::value;
+                REQUIRE(actual);
+    }
+}
+
+TEST_SUITE("Testing ArgumentIsResultButFunctionAcceptsItsSuccessType"){
+    TEST_CASE("With Result<double, ErrorType>& and f(double&) it should match"){
+        auto  callable = [](double& d){ return d+3;};
+        using ArgType = result_type::Result<double, ErrorType>&;
+        using CalleeType = decltype(callable);
+        auto const actual =  result_type::ArgumentIsResultWithNonOptionalButFunctionAcceptsItsSuccessType<ArgType , CalleeType>::value;
+
+        REQUIRE(!result_type::isInvokeable<CalleeType, ArgType>::value);
+        REQUIRE(result_type::isResultTypeWithNonOptional<ArgType>::value);
+        REQUIRE(result_type::isInvokeable<CalleeType, decltype(std::declval<ArgType>().Success())>::value);
+        REQUIRE(actual);
+    }
+}
+
+TEST_SUITE("Testing isResultTypeWithNonOptional"){
+    using result_type::isResultTypeWithNonOptional;
+    TEST_CASE("With Result<double, ErrorType>& and f(double&) it should match"){
+        using ArgType = result_type::Result<double, ErrorType>&;
+        auto const actual =  result_type::isResultTypeWithNonOptional<ArgType>::value;
+
+        REQUIRE(result_type::is_result_type<ArgType>::value);
+        REQUIRE(!result_type::is_optional_type< decltype(std::declval<ArgType>().Success())>::value);
+        REQUIRE(actual);
+    }
+}
+TEST_SUITE("Testing isResultTypeWithNonOptional"){
+    using result_type::isResultTypeWithOptional;
+    TEST_CASE("With Result<double, ErrorType>& and f(double&) it should match"){
+        using ArgType = result_type::Result<result_type::Optional<double>, ErrorType>&;
+        auto const actual =  result_type::isResultTypeWithOptional<ArgType>::value;
+
+        REQUIRE(actual);
+    }
+}

@@ -117,9 +117,7 @@ namespace result_type::detail{
 
     template<typename ArgType, typename Callee>
     struct call<ArgType, Callee, std::enable_if_t<
-            !isInvokeable<Callee, ArgType>::value
-            && isResultTypeWithNonOptional<ArgType>::value
-            && isInvokeable<Callee, typename ArgType::ResultSuccessType>::value
+            ArgumentIsResultWithNonOptionalButFunctionAcceptsItsSuccessType<ArgType, Callee>::value
             , void>>
     {
         // piping a Result<T, E> to a function void f(T), returns Result<result_type::NothingType, E>

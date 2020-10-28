@@ -104,19 +104,19 @@ using detected_or = detail::detector<Default, void, Op, Args...>;
     template <typename T>
     struct isResultTypeWithNonOptional<T, std::enable_if_t<
             is_result_type<T>::value
-            && !is_optional_type<typename T::ResultSuccessType>::value
+            && !is_optional_type<decltype(std::declval<T>().Success())>::value
             , void>>:std::true_type {};
     template <typename T, typename = void>
     struct isResultTypeWithOptional:std::false_type {};
     template <typename T>
     struct isResultTypeWithOptional<T, std::enable_if_t<
             is_result_type<T>::value
-            && is_optional_type<typename T::ResultSuccessType>::value
+            && is_optional_type<decltype(std::declval<T>().Success())>::value
             , void>>:std::true_type {};
 
 
     template<typename Callee, typename ArgType>
-    using accepts = decltype(std::declval<Callee>()(std::declval<std::remove_reference_t<ArgType>>()));
+    using accepts = decltype(std::declval<Callee>()(std::declval<ArgType>()));
 
     template<typename Callee, typename ArgType, typename = void>
     struct isInvokeable : std::false_type{};
@@ -132,6 +132,15 @@ using detected_or = detail::detector<Default, void, Op, Args...>;
     struct is_tuple_with_result<std::tuple<Ts...>> {
         constexpr static auto value = (result_type::is_result_type<Ts>::value || ...);
     };
+
+    template<typename ArgType, typename CalleeType, typename = void>
+    struct ArgumentIsResultWithNonOptionalButFunctionAcceptsItsSuccessType: std::false_type{};
+
+    template<typename ArgType, typename CalleeType>
+    struct ArgumentIsResultWithNonOptionalButFunctionAcceptsItsSuccessType<ArgType, CalleeType,
+            std::enable_if_t<!isInvokeable<CalleeType, ArgType>::value
+            && isResultTypeWithNonOptional<ArgType>::value
+            && isInvokeable<CalleeType, decltype(std::declval<ArgType>().Success())>::value, void>>:std::true_type {};
 
 
 }

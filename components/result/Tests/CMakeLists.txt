@@ -13,7 +13,7 @@ set(SOURCE_FILES
         Test_possible_combinations.cpp
         Test_properties.cpp
         Test_stream.cpp
-        )
+        Test_pipeoperator.cpp)
 
 if (CPPRESULTTYPE_CAN_USE_OVERLOAD_PATTERN)
 list(APPEND SOURCE_FILES
