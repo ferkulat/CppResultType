@@ -46,7 +46,7 @@ namespace result_type::detail{
     struct call<ArgType, Callee, std::enable_if_t<
             !isInvokeable<Callee, ArgType>::value
             && is_optional_type<ArgType>::value
-            && isInvokeable<Callee, typename ArgType::value_type>::value
+            && isInvokeable<Callee, decltype(std::declval<ArgType>().value())>::value
             , void>>
     {
         // piping an Optional<T> to a function void f(T), returns Optional<result_type::NothingType>
@@ -162,8 +162,8 @@ namespace result_type::detail{
 
         template<typename ResultOptArgType, typename Callee_>
         static auto with(ResultOptArgType&&result_opt_arg, Callee_&& callee)-> std::enable_if_t<
-         !isInvokeable<Callee, typename ArgType::ResultSuccessType>::value
-        &&isInvokeable<Callee, typename ArgType::ResultSuccessType::value_type>::value
+         !isInvokeable<Callee_, decltype(std::declval<ResultOptArgType>().Success())>::value
+        &&isInvokeable<Callee_, decltype(std::declval<ResultOptArgType>().Success().value())>::value
         ,detail::ReturnType_t<ResultOptArgType, Callee_, decltype(callee(std::forward<ResultOptArgType>(result_opt_arg).Success().value())) >>{
             if (isSuccess(result_opt_arg)){
                 using result_type::operator|;
@@ -174,7 +174,7 @@ namespace result_type::detail{
 
         template<typename ResultOptArgType, typename Callee_>
         static auto with(ResultOptArgType&&result_opt_arg, Callee_&& callee)-> std::enable_if_t<
-                isInvokeable<Callee, typename ArgType::ResultSuccessType>::value
+                isInvokeable<Callee, decltype(std::declval<ResultOptArgType>().Success())>::value
                 && !std::is_void<decltype(callee(std::forward<ResultOptArgType>(result_opt_arg).Success()))>::value
                 ,detail::ReturnType_t<ResultOptArgType, Callee_, decltype(callee(std::forward<ResultOptArgType>(result_opt_arg).Success())) >>{
             if (isSuccess(result_opt_arg)){
@@ -186,7 +186,7 @@ namespace result_type::detail{
 
         template<typename ResultOptArgType, typename Callee_>
         static auto with(ResultOptArgType&&result_opt_arg, Callee_&& callee)-> std::enable_if_t<
-                isInvokeable<Callee, typename ArgType::ResultSuccessType>::value
+                isInvokeable<Callee, decltype(std::declval<ResultOptArgType>().Success())>::value
                 && std::is_void<decltype(callee(std::forward<ResultOptArgType>(result_opt_arg).Success()))>::value
                 ,detail::ReturnType_t<ResultOptArgType, Callee_, decltype(callee(std::forward<ResultOptArgType>(result_opt_arg).Success())) >>{
             if (isSuccess(result_opt_arg)){

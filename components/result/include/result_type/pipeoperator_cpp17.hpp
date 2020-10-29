@@ -20,7 +20,7 @@ namespace detail{
         if constexpr (std::is_invocable_v<Callee, OPT>){
             return std::forward<Callee>(callee)(std::forward<OPT>(opt));
         }
-        else if constexpr (std::is_invocable_v<Callee,  typename std::remove_reference_t<OPT>::value_type>) {
+        else if constexpr (std::is_invocable_v<Callee,  decltype(std::declval<OPT>().value())>) {
             using CalleeReturnType = decltype(std::forward<Callee>(callee)(std::forward<OPT>(opt).value()));
 
             if constexpr (is_optional_type<CalleeReturnType>::value) {
@@ -69,7 +69,7 @@ namespace detail{
             }
         }
         else{
-            return detail::CalleeIsNotInvokableWithArgType<typename OPT::value_type, Callee>{};
+            return detail::CalleeIsNotInvokableWithArgType<decltype(std::declval<OPT>().value()), Callee>{};
         }
     }
     template<typename ArgType, typename Callee>
@@ -81,7 +81,7 @@ namespace detail{
         if constexpr (std::is_invocable_v<Callee, ArgType>) {
             return callee(std::forward<ArgType>(arg));
         }
-        else if constexpr (std::is_invocable_v<Callee, ArgSuccessType>) {
+        else if constexpr (std::is_invocable_v<Callee, decltype (std::declval<ArgType>().Success())>) {
             using callee_return_type = decltype(callee(std::declval<ArgSuccessType>()));
             if constexpr (is_result_type<callee_return_type>::value) {
                 return isSuccess(arg) ? callee(std::forward<ArgType>(arg).Success())
@@ -115,7 +115,7 @@ namespace detail{
 //                return callee(std::forward<ArgType>(arg));
                 return detail::CalleeIsNotInvokableWithArgType<ArgType, Callee>{};
             }
-            else if constexpr (std::is_invocable_v<Callee, typename ArgSuccessType::value_type>) {
+            else if constexpr (std::is_invocable_v<Callee, decltype (std::declval<ArgType>().Success().value())>) {
                 using callee_return_type = decltype(std::forward<Callee>(callee)(std::forward<ArgType>(arg).Success().value()));
 
                 if constexpr (is_result_type<callee_return_type>::value){
@@ -149,7 +149,7 @@ namespace detail{
                     }
                 }
                 else {
-                    using flattened_callee_return_type = decltype(callWithOptional( std::declval<ArgSuccessType>(),
+                    using flattened_callee_return_type = decltype(callWithOptional( std::forward<ArgType>(arg).Success(),
                                                                                     std::forward<Callee>(callee)));
                     using ReturnType = Result<flattened_callee_return_type, ErrorReturnType>;
                     if (isSuccess(arg)) {
