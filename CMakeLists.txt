@@ -13,17 +13,6 @@ enable_testing()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-if (CPPRESULTTYPE_WITH_BOOST_VARIANT)
-    add_definitions(-DCPPRESULTTYPE_WITH_BOOST_VARIANT)
-endif ()
-
-if (CPPRESULTTYPE_WITH_BOOST_OPTIONAL)
-    add_definitions(-DCPPRESULTTYPE_WITH_BOOST_OPTIONAL)
-endif ()
-
-if (CPPRESULTTYPE_WITH_CPP14_PIPE)
-    add_definitions(-DCPPRESULTTYPE_WITH_CPP14_PIPE)
-endif ()
 
 add_subdirectory(components)
 
