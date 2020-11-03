@@ -22,7 +22,7 @@ TEST_CASE("pipe a non const lvalue Optional<T> to a function accepting a non con
     auto input = result_type::Optional<double>{double{3.0}};
     using result_type::operator|;
     auto const actual = input | fun;
-    REQUIRE(actual.is_initialized());
+    REQUIRE(actual);
 }
 
 TEST_CASE("pipe a non const lvalue Result<S,E> to a function accepting a non const reference of S, should compile"){
