@@ -59,8 +59,11 @@ using detected_t = typename detail::detector<nonesuch, void, Op, Args...>::type;
 template <class Default, template<class...> class Op, class... Args>
 using detected_or = detail::detector<Default, void, Op, Args...>;
 
+    template<class T, typename = void>
+    struct is_result_type:std::false_type{};
+
     template<class T>
-    using is_result_type = is_detected<detail::has_Success, T>;
+    struct is_result_type<T, std::void_t<detail::has_Success<T>>>:std::true_type{};
 
     template<class T>
     using has_method_has_value = is_detected<detail::has_method_has_value, T>;
@@ -130,7 +133,7 @@ using detected_or = detail::detector<Default, void, Op, Args...>;
 
     template<typename...Ts>
     struct is_tuple_with_result<std::tuple<Ts...>> {
-        constexpr static auto value = (result_type::is_result_type<Ts>::value || ...);
+        constexpr static bool value = (result_type::is_result_type<Ts>::value || ...);
     };
 
     template<typename ArgType, typename CalleeType, typename = void>

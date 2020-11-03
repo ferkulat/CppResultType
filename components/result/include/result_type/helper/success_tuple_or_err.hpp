@@ -7,7 +7,8 @@
 #include <tuple>
 #include <result_type/typetraits.hpp>
 #include <result_type/result.hpp>
-#include <result_type/helper/detail/apply.hpp>
+#include <result_type/apply.hpp>
+
 namespace result_type::helper::detail{
 
     template <typename T, typename = void>
@@ -138,7 +139,7 @@ namespace result_type::helper::detail{
             auto tupleOfSuccess = [](auto &&...args) {
                 return std::make_tuple(successOf(std::forward<decltype(args)>(args))...);
             };
-            using ReturnSuccessType = decltype(std::apply(tupleOfSuccess, std::forward<Tuple>(tuple)));
+            using ReturnSuccessType = decltype(apply(tupleOfSuccess, std::forward<Tuple>(tuple)));
             using ReturnErrorType   = typename std::tuple_element_t<0, AllResultTypes>::ResultErrorType;
 
             using ReturnType = result_type::Result<ReturnSuccessType, ReturnErrorType>;
@@ -149,10 +150,10 @@ namespace result_type::helper::detail{
 
 
 
-            if (std::apply(is_err, std::forward<Tuple>(tuple))) {
+            if (apply(is_err, std::forward<Tuple>(tuple))) {
                 return ReturnType{FirstError<ReturnErrorType>::get(std::forward<Tuple>(tuple)).value()};
             }
-            return ReturnType{std::apply(tupleOfSuccess, std::forward<Tuple>(tuple))};
+            return ReturnType{apply(tupleOfSuccess, std::forward<Tuple>(tuple))};
         }
     };
     template<typename Tuple>

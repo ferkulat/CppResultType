@@ -13,7 +13,9 @@ set(SOURCE_FILES
         Test_possible_combinations.cpp
         Test_properties.cpp
         Test_stream.cpp
-        Test_pipeoperator.cpp)
+        Test_tuple_holding_result.cpp
+        Test_pipeoperator.cpp
+        )
 
 if (CPPRESULTTYPE_CAN_USE_OVERLOAD_PATTERN)
 list(APPEND SOURCE_FILES
@@ -21,12 +23,7 @@ list(APPEND SOURCE_FILES
         )
 endif ()
 
-if (CPPRESULTTYPE_CAN_USE_STD_APPLY)
-    list(APPEND SOURCE_FILES
-            Test_tuple_holding_result.cpp
-            )
 
-endif ()
 add_executable(resulttypetests ${SOURCE_FILES})
 
 

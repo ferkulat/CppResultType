@@ -1,5 +1,10 @@
 #include <doctest/doctest.h>
 #include <result_type/pipeoperator.hpp>
+#ifdef CPPRESULTTYPE_WITH_BOOST_OPTIONAL
+// if not included, Doctest fails to compile
+#include <boost/optional/optional_io.hpp>
+#endif
+
 enum class ErrorType {lol};
 TEST_CASE("pipe a non const lvalue to a function accepting a non const reference, should compile"){
     auto fun = [](double& d){return d*2;};
