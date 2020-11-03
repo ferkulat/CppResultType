@@ -18,27 +18,30 @@ enum class Error {
 TEST_CASE("Given a tuple with at no member of type Result<S,E>, when passing this type to ContainsResult, then ::value is false")
 {
     using MyType = std::tuple<float,int>;
+    constexpr auto actual = result_type::is_tuple_with_result<MyType>::value;
 
-    CHECK_FALSE(result_type::is_tuple_with_result<MyType>::value);
+    CHECK_FALSE(actual);
 }
 
 TEST_CASE("Given a tuple with at least one member of type Result<S,E>, when passing this type to ContainsResult, then ::value is true")
 {
     using MyType = std::tuple<int, result_type::Result<float, Error >, float>;
+    constexpr auto actual = result_type::is_tuple_with_result<MyType>::value;
 
-    CHECK(result_type::is_tuple_with_result<MyType>::value);
+    CHECK(actual);
 }
 
 TEST_CASE("Given a type that is not a tuple, when passing this type to ContainsResult, then ::value is false")
 {
     using MyType = std::tuple<float>;
-
-    CHECK_FALSE(result_type::is_tuple_with_result<MyType>::value);
+    constexpr auto actual = result_type::is_tuple_with_result<MyType>::value;
+    CHECK_FALSE(actual);
 }
 
 TEST_CASE("Given a type which is not Result<S,E>, when passing this type to success_type, then ::type is type")
 {
-    CHECK(std::is_same<result_type::helper::detail::success_type<float>::type, float>::value);
+    constexpr auto actual = std::is_same<result_type::helper::detail::success_type<float>::type, float>::value;
+    CHECK(actual);
 }
 
 TEST_CASE("Given a type which is Result<S,E>, when passing this type to success_type, then ::type is S")
