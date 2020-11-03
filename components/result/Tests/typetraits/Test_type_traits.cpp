@@ -3,6 +3,7 @@
 #include <result_type/typetraits.hpp>
 #include <result_type/result.hpp>
 #include <result_type/detail/returntype.hpp>
+#include <string>
 using result_type::Result;
 using result_type::Optional;
 using result_type::NothingType;
