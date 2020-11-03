@@ -139,7 +139,7 @@ namespace result_type::helper::detail{
             auto tupleOfSuccess = [](auto &&...args) {
                 return std::make_tuple(successOf(std::forward<decltype(args)>(args))...);
             };
-            using ReturnSuccessType = decltype(apply(tupleOfSuccess, std::forward<Tuple>(tuple)));
+            using ReturnSuccessType = decltype(result_type::apply(tupleOfSuccess, std::forward<Tuple>(tuple)));
             using ReturnErrorType   = typename std::tuple_element_t<0, AllResultTypes>::ResultErrorType;
 
             using ReturnType = result_type::Result<ReturnSuccessType, ReturnErrorType>;
@@ -150,10 +150,10 @@ namespace result_type::helper::detail{
 
 
 
-            if (apply(is_err, std::forward<Tuple>(tuple))) {
+            if (result_type::apply(is_err, std::forward<Tuple>(tuple))) {
                 return ReturnType{FirstError<ReturnErrorType>::get(std::forward<Tuple>(tuple)).value()};
             }
-            return ReturnType{apply(tupleOfSuccess, std::forward<Tuple>(tuple))};
+            return ReturnType{result_type::apply(tupleOfSuccess, std::forward<Tuple>(tuple))};
         }
     };
     template<typename Tuple>
