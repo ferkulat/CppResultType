@@ -81,8 +81,8 @@ namespace detail{
         if constexpr (std::is_invocable_v<Callee, ArgType>) {
             return callee(std::forward<ArgType>(arg));
         }
-        else if constexpr (std::is_invocable_v<Callee, decltype (std::declval<ArgType>().Success())>) {
-            using callee_return_type = decltype(callee(std::declval<ArgSuccessType>()));
+        else if constexpr (std::is_invocable_v<Callee, decltype(std::forward<ArgType>(arg).Success())>) {
+            using callee_return_type = decltype(callee(std::forward<ArgType>(arg).Success()));
             if constexpr (is_result_type<callee_return_type>::value) {
                 return isSuccess(arg) ? callee(std::forward<ArgType>(arg).Success())
                                       : callee_return_type(std::forward<ArgType>(arg).Error());
@@ -119,9 +119,9 @@ namespace detail{
                 using callee_return_type = decltype(std::forward<Callee>(callee)(std::forward<ArgType>(arg).Success().value()));
 
                 if constexpr (is_result_type<callee_return_type>::value){
-                    using CalleeReturnSuccessType = typename callee_return_type::ResultSuccessType;
+                    using CalleeReturnSuccessType = decltype(std::declval<callee_return_type>().Success());
                     if constexpr (is_optional_type<CalleeReturnSuccessType>::value){
-                        using ReturnType = Result<CalleeReturnSuccessType, ErrorReturnType>;
+                        using ReturnType = Result<std::remove_reference_t<CalleeReturnSuccessType>, ErrorReturnType>;
 
                         if (isSuccess(arg)) {
                             return (arg.CRefSuccess().has_value())
@@ -133,15 +133,15 @@ namespace detail{
                         }
                     }
                     else {
-                        using ReturnType = Result<Optional<CalleeReturnSuccessType>, ErrorReturnType>;
+                        using ReturnType = Result<Optional<std::remove_reference_t<CalleeReturnSuccessType>>, ErrorReturnType>;
                         if (isSuccess(arg)) {
                             if (arg.CRefSuccess().has_value()) {
                                 auto result = callee(std::forward<ArgType>(arg).Success().value());
                                 return (isSuccess(result))
-                                       ? ReturnType{Optional<CalleeReturnSuccessType>(std::move(result).Success())}
+                                       ? ReturnType{Optional<std::remove_reference_t<CalleeReturnSuccessType>>(std::move(result).Success())}
                                        : ReturnType{std::move(result).Error()};
                             }
-                            return ReturnType{Optional<CalleeReturnSuccessType>{}};
+                            return ReturnType{Optional<std::remove_reference_t<CalleeReturnSuccessType>>{}};
 
                         } else{
                             return ReturnType(std::forward<ArgType>(arg).Error());
