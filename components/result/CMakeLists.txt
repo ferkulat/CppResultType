@@ -51,11 +51,11 @@ install(
         COMPONENT ${component}
 )
 
-install(
-        DIRECTORY components/resulttype/include
-        COMPONENT ${component}
-        DESTINATION ${CMAKE_INSTALL_PREFIX}
-)
+#install(
+#        DIRECTORY components/resulttype/include
+#        COMPONENT ${component}
+#        DESTINATION ${CMAKE_INSTALL_PREFIX}
+#)
 
 #set(CMAKE_VERBOSE_MAKEFILE ON)
 add_subdirectory(Tests)
