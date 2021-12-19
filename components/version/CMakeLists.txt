@@ -44,21 +44,21 @@ install(EXPORT ${component}-targets
 # This seems like a kludge, but it does place the file in the correct location
 # on my machine (Ubuntu 18.04). Idea taken from Poco
 configure_file("${component}-config.cmake.in"
-  "${CMAKE_BINARY_DIR}/${project}-${component}-config.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/${project}-${component}-config.cmake"
   @ONLY
 )
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
-  "${CMAKE_BINARY_DIR}/${project}-${component}-config-version.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/${project}-${component}-config-version.cmake"
   VERSION ${version}
   COMPATIBILITY AnyNewerVersion
 )
 
 install(
   FILES
-  "${CMAKE_BINARY_DIR}/${project}-${component}-config.cmake"
-  "${CMAKE_BINARY_DIR}/${project}-${component}-config-version.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/${project}-${component}-config.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/${project}-${component}-config-version.cmake"
   DESTINATION lib/cmake/${project}
   COMPONENT ${component}
 )

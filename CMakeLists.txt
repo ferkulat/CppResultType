@@ -21,11 +21,11 @@ include ( CMakePackageConfigHelpers )
 set ( ${PROJECT_NAME}_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" )
 set ( CMAKE_CONFIG_DEST "share/cmake/Modules" )
 configure_package_config_file(${project}Config.cmake.in
-        "${CMAKE_BINARY_DIR}/${project}Config.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/${project}Config.cmake"
         INSTALL_DESTINATION "${CMAKE_CONFIG_DEST}"
         )
 # This file is included in our template:
-export ( TARGETS FILE "${CMAKE_BINARY_DIR}/${project}Targets.cmake" )
+export ( TARGETS FILE "${CMAKE_CURRENT_BINARY_DIR}/${project}Targets.cmake" )
 
 export ( PACKAGE ${PROJECT_NAME} )
 
