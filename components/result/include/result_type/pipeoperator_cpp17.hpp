@@ -7,7 +7,7 @@
 #include <result_type/result.hpp>
 #include <type_traits>
 #include <result_type/typetraits.hpp>
-
+#include <ranges>
 
 namespace result_type {
 namespace detail{
@@ -167,6 +167,10 @@ namespace detail{
 
 }
     template<typename ArgType, typename Callee>
+    requires (!(
+                  (std::derived_from<std::remove_cvref_t<ArgType>, std::ranges::views::__adaptor::_RangeAdaptorClosure> && std::ranges::views::__adaptor::__adaptor_invocable<ArgType, Callee>)
+                ||((std::derived_from<std::remove_cvref_t<ArgType>, std::ranges::views::__adaptor::_RangeAdaptorClosure> || std::derived_from<std::remove_cvref_t<Callee>, std::ranges::views::__adaptor::_RangeAdaptorClosure>))
+               ))
     constexpr auto operator|(ArgType &&arg, Callee &&callee){
 
         if constexpr (std::is_invocable_v<Callee, ArgType>){
