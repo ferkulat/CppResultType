@@ -7,7 +7,7 @@
 
 #include <tuple>
 
-#ifdef CPPRESULTTYPE_CAN_USE_STD_APPLY
+#ifdef CPPRESULTTYPE_WITH_STD_APPLY
 namespace result_type{
     template<typename F, typename TUPLE>
     auto apply(F&&f, TUPLE&& tup) {
