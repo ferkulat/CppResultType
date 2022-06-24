@@ -13,6 +13,7 @@ enable_testing()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+option(CPPRESULTTYPE_UNIT_TESTS "compile CppResultType unit tests" OFF)
 
 add_subdirectory(components)
 
