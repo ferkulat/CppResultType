@@ -14,21 +14,6 @@ target_include_directories(${component}
         $<INSTALL_INTERFACE:include>
         )
 
-install(TARGETS ${component} EXPORT ${component}-targets
-        COMPONENT ${component}
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib
-        RUNTIME DESTINATION bin
-        INCLUDES DESTINATION include
-        )
-
-install(EXPORT ${component}-targets
-        FILE "${project}-${component}-targets.cmake"
-        NAMESPACE ${project}::
-        DESTINATION lib/cmake/${project}
-        COMPONENT ${component}
-        )
-
 # This seems like a kludge, but it does place the file in the correct location
 # on my machine (Ubuntu 18.04). Idea taken from Poco
 configure_file("${component}-config.cmake.in"
@@ -42,20 +27,6 @@ write_basic_package_version_file(
         VERSION ${version}
         COMPATIBILITY AnyNewerVersion
 )
-
-install(
-        FILES
-        "${CMAKE_CURRENT_BINARY_DIR}/${project}-${component}-config.cmake"
-        "${CMAKE_CURRENT_BINARY_DIR}/${project}-${component}-config-version.cmake"
-        DESTINATION lib/cmake/${project}
-        COMPONENT ${component}
-)
-
-#install(
-#        DIRECTORY components/resulttype/include
-#        COMPONENT ${component}
-#        DESTINATION ${CMAKE_INSTALL_PREFIX}
-#)
 
 #set(CMAKE_VERBOSE_MAKEFILE ON)
 if (CPPRESULTTYPE_UNIT_TESTS)
