@@ -58,4 +58,6 @@ install(
 #)
 
 #set(CMAKE_VERBOSE_MAKEFILE ON)
-add_subdirectory(Tests)
+if (CPPRESULTTYPE_UNIT_TESTS)
+    add_subdirectory(Tests)
+endif ()
